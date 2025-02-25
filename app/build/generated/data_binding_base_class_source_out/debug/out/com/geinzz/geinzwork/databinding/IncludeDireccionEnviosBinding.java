@@ -34,6 +34,9 @@ public final class IncludeDireccionEnviosBinding implements ViewBinding {
   public final EditText direccionED;
 
   @NonNull
+  public final TextView idSelecionado;
+
+  @NonNull
   public final TextView latitudUSer;
 
   @NonNull
@@ -59,7 +62,7 @@ public final class IncludeDireccionEnviosBinding implements ViewBinding {
 
   private IncludeDireccionEnviosBinding(@NonNull LinearLayout rootView,
       @NonNull MaterialButton creaDireccion, @NonNull TextInputLayout direccion,
-      @NonNull EditText direccionED, @NonNull TextView latitudUSer,
+      @NonNull EditText direccionED, @NonNull TextView idSelecionado, @NonNull TextView latitudUSer,
       @NonNull LinearLayout layoutContainer, @NonNull TextView longituduser,
       @NonNull AutoCompleteTextView precioDelivery,
       @NonNull TextInputLayout preciodeliveryTextInputLayout, @NonNull RecyclerView reccileRadioBtn,
@@ -68,6 +71,7 @@ public final class IncludeDireccionEnviosBinding implements ViewBinding {
     this.creaDireccion = creaDireccion;
     this.direccion = direccion;
     this.direccionED = direccionED;
+    this.idSelecionado = idSelecionado;
     this.latitudUSer = latitudUSer;
     this.layoutContainer = layoutContainer;
     this.longituduser = longituduser;
@@ -123,6 +127,12 @@ public final class IncludeDireccionEnviosBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.idSelecionado;
+      TextView idSelecionado = ViewBindings.findChildViewById(rootView, id);
+      if (idSelecionado == null) {
+        break missingId;
+      }
+
       id = R.id.latitudUSer;
       TextView latitudUSer = ViewBindings.findChildViewById(rootView, id);
       if (latitudUSer == null) {
@@ -172,7 +182,7 @@ public final class IncludeDireccionEnviosBinding implements ViewBinding {
       }
 
       return new IncludeDireccionEnviosBinding((LinearLayout) rootView, creaDireccion, direccion,
-          direccionED, latitudUSer, layoutContainer, longituduser, precioDelivery,
+          direccionED, idSelecionado, latitudUSer, layoutContainer, longituduser, precioDelivery,
           preciodeliveryTextInputLayout, reccileRadioBtn, referencia, referenciaED);
     }
     String missingId = rootView.getResources().getResourceName(id);

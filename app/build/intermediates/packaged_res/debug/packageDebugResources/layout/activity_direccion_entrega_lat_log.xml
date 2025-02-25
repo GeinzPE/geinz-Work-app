@@ -42,6 +42,13 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+
+            <TextView
+                android:id="@+id/idReferencia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="0dp" />
+
             <TextView
                 android:visibility="gone"
                 android:id="@+id/collectionEcontrado"

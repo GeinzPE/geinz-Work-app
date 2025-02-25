@@ -188,6 +188,10 @@
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\cargar_noticias.xml"
     },
     {
+        "merged": "com.geinzz.geinzwork.app-debug-56:/layout_include_direccion_envios.xml.flat",
+        "source": "com.geinzz.geinzwork.app-main-58:/layout/include_direccion_envios.xml"
+    },
+    {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-debug-56:\\drawable_ic_wb_cloudy_with_padding.xml.flat",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\drawable\\ic_wb_cloudy_with_padding.xml"
     },
@@ -1482,10 +1486,6 @@
     {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-debug-56:\\layout_fragment_sin_internet.xml.flat",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\fragment_sin_internet.xml"
-    },
-    {
-        "merged": "com.geinzz.geinzwork.app-debug-56:/layout_activity_vista_tienda.xml.flat",
-        "source": "com.geinzz.geinzwork.app-main-58:/layout/activity_vista_tienda.xml"
     },
     {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-debug-56:\\drawable_eliminar_user_icon.webp.flat",

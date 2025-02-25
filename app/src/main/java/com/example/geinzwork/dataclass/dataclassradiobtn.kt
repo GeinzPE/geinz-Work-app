@@ -6,4 +6,5 @@ data class dataclassradiobtn(
     val log: String?,
     val referencia: String?,
     val direccion: String?,
+    val nombreRef:String?,
 )

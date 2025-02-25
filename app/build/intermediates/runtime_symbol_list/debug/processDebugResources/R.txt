@@ -5301,6 +5301,8 @@ int id idApelacio_problema 0x7f0a037a
 int id idDoc 0x7f0a037b
 int id idProblema 0x7f0a037c
 int id idPublicidad 0x7f0a037d
+int id idReferencia 0x7f0a078b
+int id idSelecionado 0x7f0a078c
 int id idTienda 0x7f0a037e
 int id id_servicio 0x7f0a037f
 int id ifRoom 0x7f0a0380

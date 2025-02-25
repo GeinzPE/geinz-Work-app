@@ -35,6 +35,7 @@ class adapterNewAnunciosTienda(
     override fun onBindViewHolder(holder: viewHolder, position: Int) {
         val item = ListaAnuncios[position]
         holder.render(with,item, ver_mas, idUser)
+
     }
 
     inner class viewHolder(private val binding: ItemNewNoticiasTiendasBinding) : RecyclerView.ViewHolder(binding.root) {

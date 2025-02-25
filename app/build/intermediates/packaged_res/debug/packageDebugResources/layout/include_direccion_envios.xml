@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/fondo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="@style/fondo"
     android:orientation="vertical">
 
     <LinearLayout
@@ -28,11 +28,10 @@
             android:orientation="horizontal">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_weight="1"
                 android:id="@+id/reccileRadioBtn"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scrollbars="horizontal" />
+                android:layout_weight="1" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/crea_direccion"
@@ -40,12 +39,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginRight="5dp"
+                android:layout_weight="1"
                 android:text="Crear Direccion nueva"
                 android:textSize="14sp"
-                app:iconGravity="textEnd"
-                android:layout_weight="1"/>
+                app:iconGravity="textEnd" />
         </LinearLayout>
 
+
+        <TextView
+            android:id="@+id/idSelecionado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="0dp"
+            android:visibility="gone"/>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/direccion"

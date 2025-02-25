@@ -37,7 +37,7 @@ class adapter_radioButton_envios(
         RecyclerView.ViewHolder(binding.root) {
         val btn = binding.docuemnto
         fun render(dataclassradiobtn: dataclassradiobtn) {
-            btn.text = dataclassradiobtn.id
+            btn.text = dataclassradiobtn.nombreRef
             btn.setOnClickListener {
                 onItemClick(dataclassradiobtn)
             }

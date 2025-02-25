@@ -59,7 +59,7 @@ class confirmacion_de_compra_tienda : AppCompatActivity() {
         val nombreUSer = intent.getStringExtra("nombreUser").toString()
         val numeroUser = intent.getStringExtra("numeroUser").toString()
         val nombreTienda = intent.getStringExtra("nombreTienda").toString()
-        val direccionUser = intent.getStringExtra("direccion_USER").toString()
+        val idReferenciaEnvio = intent.getStringExtra("idReferenciaEnvio").toString()
         val TotalPagar = intent.getStringExtra("total").toString()
         val metodoEntrega = intent.getStringExtra("metodoEntrega").toString()
         val metodoPago = intent.getStringExtra("metodoPago").toString()
@@ -100,39 +100,30 @@ class confirmacion_de_compra_tienda : AppCompatActivity() {
             builder.setMessage("Al confirmar este pedido, su tiempo máximo de cancelación es de 3 minuto. Pasados 3 minuto, el pedido no podrá ser cancelado.")
             builder.setPositiveButton("Aceptar") { dialog, which ->
                 val carritoDataclass = dataclassCarritoCompra(
-                    idDriver = "",
                     idPedido = codigoPedido,
-                    estado = "pendiente",
-                    metodoPago = metodoPago,
-                    productos = listaProductoss,
-                    estadoPedido = "pendiente",
-                    metodoEntrega = metodoEntrega,
-                    tipoRealizado = "compra carrito",
+                    idTienda = idTienda,
+                    idUser = firebaseAuth.uid.toString(),
+                    idRef_user = idReferenciaEnvio.takeIf { it.isNotBlank() }
+                        ?: "", // Como en la data class es opcional, lo dejamos nulo
 
-                    // Totales para cancelar
+                    metodoEntrega = metodoEntrega,
+                    metodoPago = metodoPago,
                     precioDelivery = precioDriverVeri,
+                    productos = listaProductoss, // Asegúrate de que este campo sea un `String` si es necesario
+
+                    tipoRealizado = "compra carrito",
                     totalCancelar = TotalPagar.toDouble(),
                     totalDriver = precioDriverVeri,
                     totalProductos = totalProductos.toDouble(),
 
-                    // Fecha y hora
+                    estado = "pendiente",
+                    estadoPedido = "pendiente",
+
                     fecha = fecha,
                     hora = hora,
-
-                    // Información de la tienda
-                    idTienda = idTienda,
-                    nombreTienda = nombreTienda,
-                    localidadTienda = localidadTienda,
-                    tipoTienda = tipoTienda,
-
-                    // Información del usuario
-                    idUser = firebaseAuth.uid.toString(),
-                    nombre = nombreUSer,
-                    numero = numeroUser,
-                    localidad = localidad,
-                    direccion = direccionUser,
-                    referencia = referencia_USER
+                    idDriver = "" // Se mantiene vacío si no hay un ID asignado
                 )
+
 
                 constantesCarrito.agregarCompra(
                     carritoDataclass,

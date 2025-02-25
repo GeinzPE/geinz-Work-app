@@ -745,6 +745,8 @@ id idApelacio_problema
 id idDoc
 id idProblema
 id idPublicidad
+id idReferencia
+id idSelecionado
 id idTienda
 id id_servicio
 id ig

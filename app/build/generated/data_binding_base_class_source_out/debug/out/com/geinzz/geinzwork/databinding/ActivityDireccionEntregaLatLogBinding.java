@@ -51,6 +51,9 @@ public final class ActivityDireccionEntregaLatLogBinding implements ViewBinding 
   public final MaterialButton eliminar;
 
   @NonNull
+  public final TextView idReferencia;
+
+  @NonNull
   public final ImageView imgLocalizacion;
 
   @NonNull
@@ -106,8 +109,8 @@ public final class ActivityDireccionEntregaLatLogBinding implements ViewBinding 
       @NonNull MaterialButton crear, @NonNull EditText direccion,
       @NonNull TextInputLayout direccionCasa, @NonNull EditText direccionCasaED,
       @NonNull MaterialButton editar, @NonNull MaterialButton eliminar,
-      @NonNull ImageView imgLocalizacion, @NonNull ImageButton infoCasa,
-      @NonNull ImageButton infoRef, @NonNull TextView latitudUSer,
+      @NonNull TextView idReferencia, @NonNull ImageView imgLocalizacion,
+      @NonNull ImageButton infoCasa, @NonNull ImageButton infoRef, @NonNull TextView latitudUSer,
       @NonNull LinearLayout linealBtnELiminarEditar, @NonNull LinearLayout linealForm,
       @NonNull LinearLayout linealubiActual, @NonNull ListView listaUbicaciones,
       @NonNull TextView longituduser, @NonNull RelativeLayout main,
@@ -124,6 +127,7 @@ public final class ActivityDireccionEntregaLatLogBinding implements ViewBinding 
     this.direccionCasaED = direccionCasaED;
     this.editar = editar;
     this.eliminar = eliminar;
+    this.idReferencia = idReferencia;
     this.imgLocalizacion = imgLocalizacion;
     this.infoCasa = infoCasa;
     this.infoRef = infoRef;
@@ -215,6 +219,12 @@ public final class ActivityDireccionEntregaLatLogBinding implements ViewBinding 
       id = R.id.eliminar;
       MaterialButton eliminar = ViewBindings.findChildViewById(rootView, id);
       if (eliminar == null) {
+        break missingId;
+      }
+
+      id = R.id.idReferencia;
+      TextView idReferencia = ViewBindings.findChildViewById(rootView, id);
+      if (idReferencia == null) {
         break missingId;
       }
 
@@ -318,7 +328,7 @@ public final class ActivityDireccionEntregaLatLogBinding implements ViewBinding 
 
       return new ActivityDireccionEntregaLatLogBinding((RelativeLayout) rootView,
           collectionEcontrado, containerSinUBI, crear, direccion, direccionCasa, direccionCasaED,
-          editar, eliminar, imgLocalizacion, infoCasa, infoRef, latitudUSer,
+          editar, eliminar, idReferencia, imgLocalizacion, infoCasa, infoRef, latitudUSer,
           linealBtnELiminarEditar, linealForm, linealubiActual, listaUbicaciones, longituduser,
           main, nombreColeccion, nombreColeccionED, nombreColecciones, numeropersonasint,
           obtenerLocalizacion, referencia, referenciaED);

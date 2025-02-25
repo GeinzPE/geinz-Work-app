@@ -9,6 +9,6 @@ data class dataClass_ubicacion_user(
     val nombreC:String?
 ){
     override fun toString(): String {
-        return "Referencia : $id"
+        return "Referencia : $nombreC"
     }
 }

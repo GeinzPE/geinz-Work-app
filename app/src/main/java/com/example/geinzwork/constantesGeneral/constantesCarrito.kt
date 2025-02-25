@@ -78,6 +78,7 @@ object constantesCarrito {
             "estadoPedido" to dataclassCarritoCompra.estadoPedido.toString(),
             "metodoEntrega" to dataclassCarritoCompra.metodoEntrega.toString(),
             "tipoRealizado" to dataclassCarritoCompra.tipoRealizado.toString(),
+            "idRef_user" to dataclassCarritoCompra.idRef_user.toString(),
 
             // Totales para cancelar
             "precioDelivery" to dataclassCarritoCompra.precioDelivery.toString(),
@@ -91,19 +92,10 @@ object constantesCarrito {
 
             // Información de la tienda
             "idTienda" to dataclassCarritoCompra.idTienda.toString(),
-            "nombreTienda" to dataclassCarritoCompra.nombreTienda.toString(),
-            "localidadTienda" to dataclassCarritoCompra.localidadTienda.toString(),
-            "tipoTienda" to dataclassCarritoCompra.tipoTienda.toString(),
 
             // Información del usuario
             "idUSer" to dataclassCarritoCompra.idUser.toString(),
-            "nombre" to dataclassCarritoCompra.nombre.toString(),
-            "numero" to dataclassCarritoCompra.numero.toString(),
-            "localidad" to (dataclassCarritoCompra.localidad.takeIf { it?.isNotBlank() ?: false } ?: ""),
-            "direccion" to (dataclassCarritoCompra.direccion.takeIf { it?.isNotBlank() ?: false } ?: ""),
-            "referencia" to (dataclassCarritoCompra.referencia.takeIf { it?.isNotBlank() ?: false } ?: ""),
             "metodoEntrega" to (dataclassCarritoCompra.metodoEntrega.takeIf { it?.isNotBlank() ?: false } ?: "Delivery"),
-            "tipoTienda" to dataclassCarritoCompra.tipoTienda.toString()
         )
 
         reaaltime.setValue(hashMapCompra)

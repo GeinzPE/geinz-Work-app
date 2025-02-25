@@ -208,11 +208,13 @@ class carrito_compras : AppCompatActivity() {
         val RadioMetodoPago = bindingbottomShet.metodoPagos.RadioMetodoPago
         val productosTotal = bindingbottomShet.totalPagar.pagoProductos
         val textoDriverPago = bindingbottomShet.totalPagar
+        val idDireccionEvios=bindingbottomShet.direccionEnvios.idSelecionado
         var metodoEntrega: String = ""
 
         var METODPAGO: String = ""
 
         obtnerDireciones(
+            idDireccionEvios,
             firebaseAuth.uid.toString(),
             lista,
             reccileRadioBtn,
@@ -391,6 +393,7 @@ class carrito_compras : AppCompatActivity() {
                         putExtra("referencia_USER", referenciaEntrega.text.toString())
                         putExtra("direccion_USER", direccionEntrega.text.toString())
                         putExtra("localidad_USER", localidadUser.text.toString())
+                        putExtra("idReferenciaEnvio",idDireccionEvios.text.toString())
 
                         putExtra("tipoTienda", tipoTienda.text.toString())
                         putExtra("localidadTiendaa", localidadTienda.text.toString())

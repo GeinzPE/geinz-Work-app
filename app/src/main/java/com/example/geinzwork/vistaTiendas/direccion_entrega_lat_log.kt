@@ -84,7 +84,7 @@ class direccion_entrega_lat_log : AppCompatActivity() {
                     if (referencia.isEmpty()) binding.referenciaED.error =
                         "Este campo es obligatorio"
                 } else {
-                    agregaDireccionUsuario(firebaseAuth.uid.toString())
+                    agregaDireccionUsuario(false, firebaseAuth.uid.toString())
                 }
             } else {
                 binding.editar.isVisible = false
@@ -100,7 +100,11 @@ class direccion_entrega_lat_log : AppCompatActivity() {
 
         }
         binding.editar.setOnClickListener {
-            agregaDireccionUsuario(firebaseAuth.uid.toString())
+            agregaDireccionUsuario(
+                true,
+                firebaseAuth.uid.toString(),
+                binding.idReferencia.text.toString()
+            )
             binding.crear.isVisible = true
         }
 
@@ -108,7 +112,7 @@ class direccion_entrega_lat_log : AppCompatActivity() {
             eliminarReferencia(
                 binding.collectionEcontrado.text.toString(),
                 firebaseAuth.uid.toString(),
-                binding.nombreColeccionED.text.toString()
+                binding.idReferencia.text.toString()
             )
         }
 
@@ -119,7 +123,7 @@ class direccion_entrega_lat_log : AppCompatActivity() {
             val direccion = ubicacion.direccion
             val id = ubicacion.id
             val referencia = ubicacion.referencia
-            val nombreColeccion=ubicacion.nombreC
+            val nombreColeccion = ubicacion.nombreC
             binding.crear.isVisible = false
             binding.linealForm.isVisible = true
             binding.nombreColeccionED.setText(nombreColeccion)
@@ -130,7 +134,8 @@ class direccion_entrega_lat_log : AppCompatActivity() {
             binding.direccionCasaED.setText(direccion)
             binding.referenciaED.setText(referencia)
             binding.editar.isVisible = true
-            binding.eliminar.isVisible=true
+            binding.idReferencia.text = id.toString()
+            binding.eliminar.isVisible = true
         }
 
     }
@@ -143,16 +148,16 @@ class direccion_entrega_lat_log : AppCompatActivity() {
         dbTrabajador.delete().addOnSuccessListener { res ->
             obtenerUbicaciones(idUSer)
             Toast.makeText(this, "ubicacion eliminada correctamente", Toast.LENGTH_SHORT).show()
-            binding.linealForm.isVisible=false
-            binding.linealBtnELiminarEditar.isVisible=false
-            binding.crear.isVisible=true
+            binding.linealForm.isVisible = false
+            binding.linealBtnELiminarEditar.isVisible = false
+            binding.crear.isVisible = true
         }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "error al eliminar la ubicacion", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun agregaDireccionUsuario(id: String) {
+    private fun agregaDireccionUsuario(editar: Boolean, id: String, idRef: String? = null) {
         val instance = FirebaseFirestore.getInstance()
         val dbTrabajador = instance.collection("Trabajadores_Usuarios_Drivers")
             .document("trabajadores").collection("trabajadores").document(id)
@@ -163,13 +168,13 @@ class direccion_entrega_lat_log : AppCompatActivity() {
         dbTrabajador.get().addOnSuccessListener { res ->
             if (res.exists()) {
                 encontrado = true
-                agregarUbicacion("trabajadores", "trabajadores", id)
+                agregarUbicacion(editar, "trabajadores", "trabajadores", id, idRef)
                 Log.d("encontrado", "Documento encontrado en trabajadores")
             }
             dbUsuario.get().addOnSuccessListener { res ->
                 if (res.exists()) {
                     encontrado = true
-                    agregarUbicacion("usuarios", "usuarios", id)
+                    agregarUbicacion(editar, "usuarios", "usuarios", id, idRef)
                     Log.d("encontrado", "Documento encontrado en usuarios")
                 }
 
@@ -203,7 +208,8 @@ class direccion_entrega_lat_log : AppCompatActivity() {
                     val id = document.getString("id") ?: "No disponible"
                     val referencia = document.getString("referencia") ?: "No disponible"
                     val nombreC = document.getString("nombre") ?: "No disponible"
-                    val ubicacion = dataClass_ubicacion_user(log, lat, direccion, id, referencia,nombreC)
+                    val ubicacion =
+                        dataClass_ubicacion_user(log, lat, direccion, id, referencia, nombreC)
                     ubicaciones.add(ubicacion)
                 }
                 mostrarUbicaciones(ubicaciones)
@@ -219,10 +225,17 @@ class direccion_entrega_lat_log : AppCompatActivity() {
                             val log = document.getString("log") ?: "No disponible"
                             val lat = document.getString("lat") ?: "No disponible"
                             val direccion = document.getString("direccion") ?: "No disponible"
-                            val id = document.getString("id") ?: "No disponible"
+                            val idRefencia = document.getString("id") ?: "No disponible"
                             val referencia = document.getString("referencia") ?: "No disponible"
                             val nombreC = document.getString("nombre") ?: "No disponible"
-                            val ubicacion = dataClass_ubicacion_user(log, lat, direccion, id, referencia,nombreC)
+                            val ubicacion = dataClass_ubicacion_user(
+                                log,
+                                lat,
+                                direccion,
+                                idRefencia,
+                                referencia,
+                                nombreC
+                            )
                             ubicaciones.add(ubicacion)
                         }
                         mostrarUbicaciones(ubicaciones)
@@ -286,7 +299,13 @@ class direccion_entrega_lat_log : AppCompatActivity() {
         }
     }
 
-    private fun agregarUbicacion(doc1: String, doc2: String, id: String) {
+    private fun agregarUbicacion(
+        editar: Boolean,
+        doc1: String,
+        doc2: String,
+        id: String,
+        idRefCreado: String? = null
+    ) {
         val db = FirebaseFirestore.getInstance()
             .collection("Trabajadores_Usuarios_Drivers")
             .document(doc1)
@@ -294,52 +313,93 @@ class direccion_entrega_lat_log : AppCompatActivity() {
             .document(id)
             .collection("ubicacion")
 
-        val hashMap = hashMapOf<String, Any>(
-            "nombre" to binding.nombreColeccionED.text.toString(),
-            "log" to binding.longituduser.text.toString(),
-            "lat" to binding.latitudUSer.text.toString(),
-            "direccion" to binding.direccionCasaED.text.toString(),
-            "referencia" to binding.referenciaED.text.toString()
-        )
+        if (editar) {
+            db.get().addOnSuccessListener { res ->
+                for (datae in res) {
+                    val data = datae.data
+                    val idReferencia = data?.get("id") as? String ?: ""
+                    if (idReferencia == idRefCreado) {
+                        val hashMap = hashMapOf<String, Any>(
+                            "log" to binding.longituduser.text.toString(),
+                            "lat" to binding.latitudUSer.text.toString(),
+                            "direccion" to binding.direccionCasaED.text.toString(),
+                            "referencia" to binding.referenciaED.text.toString()
+                        )
+                        db.document(idRefCreado).set(hashMap, SetOptions.merge())
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this,
+                                    "cambios realizados correctamente",
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-        db.add(hashMap)
-            .addOnSuccessListener { documentReference ->
-                // Ahora actualizamos el documento con su ID generado
-                documentReference.update("id", documentReference.id)
-                    .addOnSuccessListener {
-                        Toast.makeText(
-                            this,
-                            "Ubicación agregada correctamente con ID: ${documentReference.id}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                                obtenerUbicaciones(firebaseAuth.uid.toString())
+
+                                // Limpiar campos y ocultar vistas
+                                binding.nombreColeccionED.setText("")
+                                binding.direccionCasaED.setText("")
+                                binding.referenciaED.setText("")
+                                binding.linealForm.isVisible = false
+                                binding.editar.isVisible = false
+                                binding.eliminar.isVisible = false
+                            }.addOnFailureListener { e->
+                                Log.e("error_actualizar","error al actulizar los datos")
+                            }
+                    } else {
+                        Log.d("encontrado", "no se enconotr uina igual")
+
                     }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(
-                            this,
-                            "Error al actualizar el ID: ${e.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                obtenerUbicaciones(firebaseAuth.uid.toString())
-
-                // Limpiar campos y ocultar vistas
-                binding.nombreColeccionED.setText("")
-                binding.direccionCasaED.setText("")
-                binding.referenciaED.setText("")
-                binding.linealForm.isVisible = false
-                binding.editar.isVisible = false
-                binding.eliminar.isVisible = false
+                }
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(
-                    this,
-                    "Error al subir la ubicación: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        } else {
+            val hashMap = hashMapOf<String, Any>(
+                "nombre" to binding.nombreColeccionED.text.toString(),
+                "log" to binding.longituduser.text.toString(),
+                "lat" to binding.latitudUSer.text.toString(),
+                "direccion" to binding.direccionCasaED.text.toString(),
+                "referencia" to binding.referenciaED.text.toString()
+            )
+
+            db.add(hashMap)
+                .addOnSuccessListener { documentReference ->
+                    // Ahora actualizamos el documento con su ID generado
+                    documentReference.update("id", documentReference.id)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "Ubicación agregada correctamente con ID: ${documentReference.id}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Error al actualizar el ID: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    obtenerUbicaciones(firebaseAuth.uid.toString())
+
+                    // Limpiar campos y ocultar vistas
+                    binding.nombreColeccionED.setText("")
+                    binding.direccionCasaED.setText("")
+                    binding.referenciaED.setText("")
+                    binding.linealForm.isVisible = false
+                    binding.editar.isVisible = false
+                    binding.eliminar.isVisible = false
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this,
+                        "Error al subir la ubicación: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
+
+
     }
-
 
 
     private fun getLocation(completado: (Boolean) -> Unit) {

@@ -40,6 +40,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.DayOfWeek
 import java.time.LocalTime
@@ -65,7 +66,8 @@ object constantes_bottomShet_fourdItem {
         idUSer: String,
         lista: MutableList<dataclassradiobtn>,
     ) {
-        val bindingBottomShjet = BottomSheetReservaProductosBinding.inflate(LayoutInflater.from(context))
+        val bindingBottomShjet =
+            BottomSheetReservaProductosBinding.inflate(LayoutInflater.from(context))
         val titulo = bindingBottomShjet.tvTitle
         val view = bindingBottomShjet.root
         val horaActual = bindingBottomShjet.horaActual
@@ -103,6 +105,7 @@ object constantes_bottomShet_fourdItem {
         val reccileRadioBtn = bindingBottomShjet.direccionEnvios.reccileRadioBtn
         val creaDireccion = bindingBottomShjet.direccionEnvios.creaDireccion
         val metodoDelivery = bindingBottomShjet.metodoEntrega.delivery
+        val idDireccionEvios = bindingBottomShjet.direccionEnvios.idSelecionado
         val radioGrupMetodoEntrega = bindingBottomShjet.metodoEntrega.RadiomodoEntrega
         val btnApply = bindingBottomShjet.btnApply
         var METODPAGO: String = ""
@@ -111,6 +114,7 @@ object constantes_bottomShet_fourdItem {
         var StokART_PROMO: String = ""
 
         obtnerDireciones(
+            idDireccionEvios,
             idUSer,
             lista,
             reccileRadioBtn,
@@ -119,7 +123,10 @@ object constantes_bottomShet_fourdItem {
             direccionEntrega,
             referenciaEntrega,
             latitudUser,
-            longitudUser, delivery_precio, pagodeldriver, totalPagar
+            longitudUser,
+            delivery_precio,
+            pagodeldriver,
+            totalPagar
         )
         obtenerHorarioDeHoy(idTienda) { apertura, cierre, boolena ->
             bindingBottomShjet.horarioAtencion.text = "$apertura AM a $cierre PM"
@@ -180,8 +187,7 @@ object constantes_bottomShet_fourdItem {
         constantes_cotizacion_driver.setearDelivery(delivery_precio, context)
         delivery_precio.setOnItemClickListener { parent, view, position, id ->
             val selectedService = parent.getItemAtPosition(position).toString()
-            constantes_cotizacion_driver.obtenerCostoDelivery(
-                longitudUser,
+            constantes_cotizacion_driver.obtenerCostoDelivery(longitudUser,
                 latitudUser,
                 idTienda,
                 { estandar ->
@@ -290,6 +296,7 @@ object constantes_bottomShet_fourdItem {
 
         when (tipo) {
             "reservaPromociones" -> {
+                firebaseAuth = FirebaseAuth.getInstance()
                 horaint.isVisible = true
                 get_obtenerPromoSugeridas(
                     tituloItem,
@@ -306,85 +313,75 @@ object constantes_bottomShet_fourdItem {
                     stokART.text = StokART_PROMO
                 }
                 btnApply.setOnClickListener {
-                    val horaentrega = horareserva.text.toString().trim()
-                    val nombre = nombreUser.text.toString().trim()
-                    val apellido = apellidouser.text.toString().trim()
-                    val numero = numeroContacto.text.toString().trim()
-                    val dni = dniUser.text.toString().trim()
-                    val localidadUserTxt = localidadUser.text.toString().trim()
-                    val nombreTienda = nombreTienda.text.toString().trim()
-                    val tituloItemPromo = tituloItem.text.toString().trim()
-                    val precioItemPromo = precioItem.text.toString().trim()
                     val cantidad = cantidad.text.toString().trim()
-                    val tipoTienda = tipoTienda.text.toString().trim()
                     val horaActual = horaActual.text.toString().trim()
                     val fechaActual = fechaActual.text.toString().trim()
-                    val pagodeldriver = pagodeldriver.text.toString().trim()
-                    val totalPagar = totalPagar.text.toString().trim()
-                    val direccionEntrega = direccionEntrega.text.toString().trim()
-                    val referenciaEntrega = referenciaEntrega.text.toString().trim()
-                    val dataclas = dataclasscompra_reserva_promociones(
-                        //campos user
-                        nombre = nombre,
-                        apellido = apellido,
-                        dni = dni,
-                        numero = numero,
-                        localidadus = localidadUserTxt,
-                        //tienda
-                        tipoReserva = "reserva promo",
-                        localidadTienda = localidaTienda.text.toString(),
-                        estado = "pendiente",
-                        nombreTienda = nombreTienda,
-                        idTienda = idTienda,
-                        tipoTienda = tipoTienda,
-                        //fecha y hora
-                        fechaActual = fechaActual,
-                        horaActual = horaActual,
-                        horaReserva = horaentrega,
-                        //producto
-                        codigoPedido = constantesCarrito.generarCodigoPedido(),
-                        metodoEntrega = metodoEntrega,
-                        tituloProducto = tituloItemPromo,
-                        idproducto = idProductoClikado,
-                        referenciaEntrega = referenciaEntrega,
-                        direcionEntrega = direccionEntrega,
-                        tipoRealizado="reserva de promociones",
-                        metodoPAgo=METODPAGO,
-                        //totales
-                        Precio_producto = precioItemPromo,
-                        Total_item_selecionado = cantidad,
-                        Total_driver = pagodeldriver,
-                        totalApagar = totalPagar,
-                    )
-                    manejarClick(
-                        "reserva_promo",
-                        bindingBottomShjet,
-                        context,
-                        metodoEntrega,
-                        idTienda,
-                        localidaTienda,
-                        localidadUser,
-                        metodoDelivery,
-                        METODPAGO
-                    ) {
-                        notificarCompraOReserva(
-                            "idReservaPedido",
-                            "reserva_promociones",
-                            idTienda,
+                    val pagodeldriver = pagodeldriver.text.toString().trim().toDouble()
+                    val totalPagar = totalPagar.text.toString().trim().toDouble()
+
+                    convertirJSON(
+                        idProductoClikado, precioItem.text.toString().toDouble(), 1
+                    ) { json ->
+                        val dataclas = dataclasscompra_reserva_promociones(
+
+                            idPedido = constantesCarrito.generarCodigoPedido(),
+                            idTienda = idTienda,
+                            idUser = firebaseAuth.uid.toString(),
+                            idRef_user = idDireccionEvios.text.toString().takeIf { it.isNotBlank() }
+                                ?: "",
+
+                            metodoEntrega = metodoEntrega,
+                            metodoPago = METODPAGO,
+                            precioDelivery = pagodeldriver,
+                            productos = json, // Asegúrate de que este campo sea un String válido
+
+                            tipoRealizado = "reserva_promociones",
+                            totalCancelar = totalPagar,
+                            totalDriver = pagodeldriver,
+                            totalProductos = totalPagar,
+
+                            estado = "pendiente",
+                            estadoPedido = "pendiente",
+
+                            fecha = fechaActual,
+                            hora = horaActual,
+                            hora_entrega_llegada = horareserva.text.toString(),
+                            fecha_entrega_llegada = null,
+
+                            idDriver = "", // Se deja vacío si no hay ID asignado
+                        )
+                        manejarClick(
+                            "reserva_promo",
+                            bindingBottomShjet,
                             context,
-                            constantesCarrito.generarCodigoPedido(),
-                            dataclas,"reserva",
-                            "Reserva de promocione",
-                        ) { enviado ->
-                            if (enviado) {
-                                dialog.dismiss()
+                            metodoEntrega,
+                            idTienda,
+                            localidaTienda,
+                            localidadUser,
+                            metodoDelivery,
+                            METODPAGO
+                        ) {
+                            notificarCompraOReserva(
+                                "idReservaPedido",
+                                "reserva_promociones",
+                                idTienda,
+                                context,
+                                constantesCarrito.generarCodigoPedido(),
+                                dataclas, "reserva",
+                                "Reserva de promocione",
+                            ) { enviado ->
+                                if (enviado) {
+                                    dialog.dismiss()
+                                }
                             }
                         }
                     }
+
                 }
             }
 
             "compraPromociones" -> {
+                firebaseAuth = FirebaseAuth.getInstance()
                 horaint.isVisible = false
                 get_obtenerPromoSugeridas(
                     tituloItem,
@@ -396,85 +393,83 @@ object constantes_bottomShet_fourdItem {
                     idTienda,
                     bindingBottomShjet,
 
-                ) { precio, stok ->
+                    ) { precio, stok ->
                     precioITemSTR = precio
                     StokART_PROMO = stok
                     stokART.text = StokART_PROMO
                 }
+
                 btnApply.setOnClickListener {
-                    val nombre = nombreUser.text.toString().trim()
-                    val apellido = apellidouser.text.toString().trim()
-                    val numero = numeroContacto.text.toString().trim()
-                    val dni = dniUser.text.toString().trim()
-                    val localidadUserTxt = localidadUser.text.toString().trim()
-                    val nombreTienda = nombreTienda.text.toString().trim()
-                    val tituloItemPromo = tituloItem.text.toString().trim()
-                    val precioItemPromo = precioItem.text.toString().trim()
+
                     val cantidad = cantidad.text.toString().trim().trim()
-                    val tipoTienda = tipoTienda.text.toString().trim()
                     val horaActual = horaActual.text.toString().trim()
                     val fechaActual = fechaActual.text.toString().trim()
-                    val pagodeldriver = pagodeldriver.text.toString().trim()
-                    val totalPagar = totalPagar.text.toString().trim()
-                    val direccionEntrega = direccionEntrega.text.toString().trim()
-                    val referenciaEntrega = referenciaEntrega.text.toString().trim()
-                    val dataclas = dataclasscompra_reserva_promociones(
-                        nombre = nombre,
-                        apellido = apellido,
-                        dni = dni,
-                        numero = numero,
-                        localidadus = localidadUserTxt,
-                        tipoReserva = "compra promocion",
-                        localidadTienda = localidaTienda.text.toString(),
-                        estado = "pendiente",
-                        nombreTienda = nombreTienda,
-                        idTienda = idTienda,
-                        tipoTienda = tipoTienda,
-                        fechaActual = fechaActual,
-                        horaActual = horaActual,
-                        horaReserva = "",
-                        codigoPedido = constantesCarrito.generarCodigoPedido(),
-                        metodoEntrega = metodoEntrega,
-                        tituloProducto = tituloItemPromo,
-                        idproducto = idProductoClikado,
-                        referenciaEntrega = referenciaEntrega,
-                        direcionEntrega = direccionEntrega,
-                        tipoRealizado="compra de promociones",
-                        metodoPAgo=METODPAGO,
-                        Precio_producto = precioItemPromo,
-                        Total_item_selecionado = cantidad,
-                        Total_driver = pagodeldriver,
-                        totalApagar = totalPagar,
-                    )
-                    manejarClick(
-                        "compra_promo",
-                        bindingBottomShjet,
-                        context,
-                        metodoEntrega,
-                        idTienda,
-                        localidaTienda,
-                        localidadUser,
-                        metodoDelivery,
-                        METODPAGO
-                    ) {
-                        notificarCompraOReserva(
-                            "productos",
-                            "compra_promociones",
-                            idTienda,
+                    val pagodeldriver = pagodeldriver.text.toString().trim().toDouble()
+                    val totalPagar = totalPagar.text.toString().toDouble()
+                    convertirJSON(
+                        idProductoClikado, precioItem.text.toString().toDouble(), 1
+                    ) { json ->
+                        val dataclas = dataclasscompra_reserva_promociones(
+
+                            idPedido = constantesCarrito.generarCodigoPedido(),
+                            idTienda = idTienda,
+                            idUser = firebaseAuth.uid.toString(),
+                            idRef_user = idDireccionEvios.text.toString().takeIf { it.isNotBlank() }
+                                ?: "",
+
+                            metodoEntrega = metodoEntrega,
+                            metodoPago = METODPAGO,
+                            precioDelivery = pagodeldriver,
+                            productos = json, // Asegúrate de que este campo sea un String válido
+
+                            tipoRealizado = "compra_promociones",
+                            totalCancelar = totalPagar,
+                            totalDriver = pagodeldriver,
+                            totalProductos = totalPagar,
+
+                            estado = "pendiente",
+                            estadoPedido = "pendiente",
+
+                            fecha = fechaActual,
+                            hora = horaActual,
+                            hora_entrega_llegada = null,
+                            fecha_entrega_llegada = null,
+                            idDriver = "", // Se deja vacío si no hay ID asignado
+                        )
+                        manejarClick(
+                            "compra_promo",
+                            bindingBottomShjet,
                             context,
-                            constantesCarrito.generarCodigoPedido(),
-                            dataclas,"compra",
-                            "Compra de promocion"
-                        ) { enviado ->
-                            if (enviado) {
-                                dialog.dismiss()
+                            metodoEntrega,
+                            idTienda,
+                            localidaTienda,
+                            localidadUser,
+                            metodoDelivery,
+                            METODPAGO
+                        ) {
+                            notificarCompraOReserva(
+                                "productos",
+                                "compra_promociones",
+                                idTienda,
+                                context,
+                                constantesCarrito.generarCodigoPedido(),
+                                dataclas,
+                                "compra",
+                                "Compra de promocion"
+                            ) { enviado ->
+                                if (enviado) {
+                                    dialog.dismiss()
+                                }
                             }
                         }
                     }
+
+
                 }
             }
 
             "reservaarticulos" -> {
+                firebaseAuth = FirebaseAuth.getInstance()
                 aumentarCantidadLineal.isVisible = true
                 get_obtenerProductos(
                     tituloItem,
@@ -491,87 +486,94 @@ object constantes_bottomShet_fourdItem {
                     stokART.text = StokART_PROMO
                 }
                 btnApply.setOnClickListener {
-                    val nombre = nombreUser.text.toString().trim()
-                    val apellido = apellidouser.text.toString().trim()
-                    val numero = numeroContacto.text.toString().trim()
-                    val dni = dniUser.text.toString().trim()
-                    val localidadUserTxt = localidadUser.text.toString().trim()
-                    val nombreTienda = nombreTienda.text.toString().trim()
-                    val tituloItemPromo = tituloItem.text.toString().trim()
-                    val precioItemPromo = precioItem.text.toString().trim()
                     val cantidad = cantidad.text.toString().trim()
-                    val tipoTienda = tipoTienda.text.toString().trim()
-                    val horaentrega = horareserva.text.toString().trim()
                     val horaActual = horaActual.text.toString().trim()
                     val fechaActual = fechaActual.text.toString().trim()
-                    val pagodeldriver = pagodeldriver.text.toString().trim()
-                    val totalPagar = totalPagar.text.toString().trim()
-                    val direccionEntrega = direccionEntrega.text.toString().trim()
-                    val referenciaEntrega = referenciaEntrega.text.toString().trim()
-                    val dataclas = dataclasscompra_reserva_promociones(
-                        //campos user
-                        nombre = nombre,
-                        apellido = apellido,
-                        dni = dni,
-                        numero = numero,
-                        localidadus = localidadUserTxt,
-                        //tienda
-                        tipoReserva = "reserva articulos",
-                        localidadTienda = localidaTienda.text.toString(),
-                        estado = "pendiente",
-                        nombreTienda = nombreTienda,
-                        idTienda = idTienda,
-                        tipoTienda = tipoTienda,
-                        //fecha y hora
-                        fechaActual = fechaActual,
-                        horaActual = horaActual,
-                        horaReserva = horaentrega,
-                        //producto
-                        codigoPedido = constantesCarrito.generarCodigoPedido(),
-                        metodoEntrega = metodoEntrega,
-                        tituloProducto = tituloItemPromo,
-                        idproducto = idProductoClikado,
-                        referenciaEntrega = referenciaEntrega,
-                        direcionEntrega = direccionEntrega,
-                        tipoRealizado="Reserva de articulos",
-                        metodoPAgo=METODPAGO,
-                        //totales
-                        Precio_producto = precioItemPromo,
-                        Total_item_selecionado = cantidad,
-                        Total_driver = pagodeldriver,
-                        totalApagar = totalPagar,
-                    )
-                    manejarClick(
-                        "reserva_promo",
-                        bindingBottomShjet,
-                        context,
-                        metodoEntrega,
-                        idTienda,
-                        localidaTienda,
-                        localidadUser,
-                        metodoDelivery,
-                        METODPAGO
-                    ) {
-                        notificarCompraOReserva(
-                            "idReservaPedido",
-                            "reserva_articulos",
-                            idTienda,
-                            context,
-                            constantesCarrito.generarCodigoPedido(),
-                            dataclas,"reserva",
-                            "Reserva de articulos",
+                    val pagodeldriver = pagodeldriver.text.toString().trim().toDouble()
+                    val totalPagar = totalPagar.text.toString().trim().toDouble()
+                    convertirJSON(
+                        idProductoClikado, precioItem.text.toString().toDouble(), cantidad.toInt()
+                    ) { json ->
+                        val dataclas = dataclasscompra_reserva_promociones(
 
-                        ) { enviado ->
-                            if (enviado) {
-                                dialog.dismiss()
+                            idPedido = constantesCarrito.generarCodigoPedido(),
+                            idTienda = idTienda,
+                            idUser = firebaseAuth.uid.toString(),
+                            idRef_user = idDireccionEvios.text.toString().takeIf { it.isNotBlank() }
+                                ?: "",
+
+                            metodoEntrega = metodoEntrega,
+                            metodoPago = METODPAGO,
+                            precioDelivery = pagodeldriver,
+                            productos = json, // Asegúrate de que este campo sea un String válido
+
+                            tipoRealizado = "reserva_articulos",
+                            totalCancelar = totalPagar,
+                            totalDriver = pagodeldriver,
+                            totalProductos = totalPagar,
+
+                            estado = "pendiente",
+                            estadoPedido = "pendiente",
+
+                            fecha = fechaActual,
+                            hora = horaActual,
+                            hora_entrega_llegada = horareserva.text.toString(),
+                            fecha_entrega_llegada = null,
+
+                            idDriver = "", // Se deja vacío si no hay ID asignado
+
+                        )
+                        manejarClick(
+                            "reserva_promo",
+                            bindingBottomShjet,
+                            context,
+                            metodoEntrega,
+                            idTienda,
+                            localidaTienda,
+                            localidadUser,
+                            metodoDelivery,
+                            METODPAGO
+                        ) {
+                            notificarCompraOReserva(
+                                "idReservaPedido",
+                                "reserva_articulos",
+                                idTienda,
+                                context,
+                                constantesCarrito.generarCodigoPedido(),
+                                dataclas, "reserva",
+                                "Reserva de articulos",
+
+                                ) { enviado ->
+                                if (enviado) {
+                                    dialog.dismiss()
+                                }
                             }
                         }
                     }
+
+
                 }
             }
         }
 
         dialog.setContentView(view)
+    }
+
+    private fun convertirJSON(
+        idClikado: String,
+        PrecioItem: Double,
+        cantidad: Int? = null,
+        json: (String) -> Unit
+    ) {
+        val productoJson = JSONObject().apply {
+            put("cantidad", cantidad)
+            put("precio", PrecioItem)
+        }
+        val productosJson = JSONObject().apply {
+            put(idClikado, productoJson)
+        }
+        json(productosJson.toString())
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -589,9 +591,7 @@ object constantes_bottomShet_fourdItem {
         ) { isWithinHours ->
             if (!isWithinHours) {
                 Toast.makeText(
-                    context,
-                    "Ingrese una hora dentro del horario de atención",
-                    Toast.LENGTH_SHORT
+                    context, "Ingrese una hora dentro del horario de atención", Toast.LENGTH_SHORT
                 ).show()
                 callback(false)
                 return@compararHoraEntregaLLegada
@@ -615,7 +615,7 @@ object constantes_bottomShet_fourdItem {
                 return@compararHoraEntregaLLegada
             }
 
-            if (!verificarCamposReservaCompra(context,binding, true)) {
+            if (!verificarCamposReservaCompra(context, binding, true)) {
                 Toast.makeText(context, "Formulario incompleto", Toast.LENGTH_SHORT).show()
                 callback(false)
                 return@compararHoraEntregaLLegada
@@ -654,13 +654,7 @@ object constantes_bottomShet_fourdItem {
                 precioPROMO(precio, stok)
                 Log.d("precio_stok", "obtenemos precio y stok $precio $stok")
                 constantesSetadas(
-                    yapeRuta,
-                    plinrRuta,
-                    context,
-                    bindingBottomShjet,
-                    yape,
-                    efectivo,
-                    plin
+                    yapeRuta, plinrRuta, context, bindingBottomShjet, yape, efectivo, plin
                 )
                 verificarViivilidad_Pagos(
                     yape,
@@ -685,10 +679,9 @@ object constantes_bottomShet_fourdItem {
                 Log.e("getErrorArt", "error")
                 precioPROMO("", "")
             }
+        }.addOnSuccessListener { res ->
+            Log.e("getErrorArt", "error al obtener el articulo de la db")
         }
-            .addOnSuccessListener { res ->
-                Log.e("getErrorArt", "error al obtener el articulo de la db")
-            }
     }
 
     private fun get_obtenerProductos(
@@ -718,13 +711,7 @@ object constantes_bottomShet_fourdItem {
                 val plinrRuta = "Tiendas/$idTienda/QR_pagos/Plin.jpg"
                 precioITEM(precio, cantidad)
                 constantesSetadas(
-                    yapeRuta,
-                    plinrRuta,
-                    context,
-                    bindingBottomShjet,
-                    yape,
-                    efectivo,
-                    plin
+                    yapeRuta, plinrRuta, context, bindingBottomShjet, yape, efectivo, plin
                 )
                 verificarViivilidad_Pagos(
                     yape,
@@ -749,10 +736,9 @@ object constantes_bottomShet_fourdItem {
                 Log.e("getErrorArt", "error")
                 precioITEM("", "")
             }
+        }.addOnSuccessListener { res ->
+            Log.e("getErrorArt", "error al obtener el articulo de la db")
         }
-            .addOnSuccessListener { res ->
-                Log.e("getErrorArt", "error al obtener el articulo de la db")
-            }
     }
 
 
@@ -760,8 +746,7 @@ object constantes_bottomShet_fourdItem {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("ATENCIÓN")
             .setMessage("Los envíos por delivery solo están disponibles para localidades iguales a las tiendas negocios o locales.")
-            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
-            .create().show()
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }.create().show()
     }
 
     private fun validacionCamposUsuario(
@@ -818,14 +803,10 @@ object constantes_bottomShet_fourdItem {
         plin: Boolean,
     ) {
         constantesImagenes.obtenerURLDescarga(
-            context,
-            bindingBottomShjet.metodoPagos.imagenYape,
-            yapeRuta
+            context, bindingBottomShjet.metodoPagos.imagenYape, yapeRuta
         )
         constantesImagenes.obtenerURLDescarga(
-            context,
-            bindingBottomShjet.metodoPagos.imagenPlin,
-            plinrRuta
+            context, bindingBottomShjet.metodoPagos.imagenPlin, plinrRuta
         )
 
         verificarViivilidad_Pagos(
@@ -852,9 +833,7 @@ object constantes_bottomShet_fourdItem {
         tituloItem.text = nombreArticulo
         precioItem.text = precio
         productosTotal.text = precio
-        Glide.with(context)
-            .load(imgArticulo)
-            .into(imgItem)
+        Glide.with(context).load(imgArticulo).into(imgItem)
     }
 
     private fun incrementarCantidad(
@@ -879,9 +858,7 @@ object constantes_bottomShet_fourdItem {
 
         if (nuevaCantidad > stockINT) {
             Toast.makeText(
-                context,
-                "La cantidad no puede superar al stock disponible",
-                Toast.LENGTH_SHORT
+                context, "La cantidad no puede superar al stock disponible", Toast.LENGTH_SHORT
             ).show()
             btnApply.isEnabled = true
         } else if (nuevaCantidad < 1) {
@@ -900,6 +877,7 @@ object constantes_bottomShet_fourdItem {
 
 
     fun obtnerDireciones(
+        TexviewIDRefDire: TextView,
         idUSer: String,
         lista: MutableList<dataclassradiobtn>,
         RecyclerView: RecyclerView,
@@ -918,8 +896,7 @@ object constantes_bottomShet_fourdItem {
                 .collection("ubicacion")
 
         val dbUsuarios = FirebaseFirestore.getInstance().collection("Trabajadores_Usuarios_Drivers")
-            .document("usuarios").collection("usuarios").document(idUSer)
-            .collection("ubicacion")
+            .document("usuarios").collection("usuarios").document(idUSer).collection("ubicacion")
         lista.clear()
         dbTrabajadores.get().addOnSuccessListener { res ->
             for (datos in res) {
@@ -929,7 +906,10 @@ object constantes_bottomShet_fourdItem {
                 val direccion = data?.get("direccion") as? String ?: ""
                 val id = data?.get("id") as? String ?: ""
                 val referencia = data?.get("referencia") as? String ?: ""
-                val dataclass = dataclassradiobtn(id, lat, log, referencia, direccion)
+                val nombre = data?.get("nombre") as? String ?: ""
+
+
+                val dataclass = dataclassradiobtn(id, lat, log, referencia, direccion, nombre)
                 lista.add(dataclass)
             }
             if (lista.isEmpty()) {
@@ -941,7 +921,9 @@ object constantes_bottomShet_fourdItem {
                         val direccion = data?.get("direccion") as? String ?: ""
                         val id = data?.get("id") as? String ?: ""
                         val referencia = data?.get("referencia") as? String ?: ""
-                        val dataclass = dataclassradiobtn(id, lat, log, referencia, direccion)
+                        val nombre = data?.get("nombre") as? String ?: ""
+                        val dataclass =
+                            dataclassradiobtn(id, lat, log, referencia, direccion, nombre)
                         lista.add(dataclass)
                     }
                     if (lista.isEmpty()) {
@@ -951,40 +933,44 @@ object constantes_bottomShet_fourdItem {
                         RecyclerView.isVisible = true
                         btnCrearDirecion.isVisible = false
                         inicializarRecicle(
+                            TexviewIDRefDire,
                             RecyclerView,
                             context,
                             lista,
                             direccion,
                             refererencia,
                             latUSser,
-                            logUSer, precioDElivery, pagoDriver, total_Pagar
+                            logUSer,
+                            precioDElivery,
+                            pagoDriver,
+                            total_Pagar
                         )
                     }
                 }.addOnFailureListener { e ->
                     Toast.makeText(
-                        context,
-                        "Error al buscar en usuarios: ${e.message}",
-                        Toast.LENGTH_SHORT
+                        context, "Error al buscar en usuarios: ${e.message}", Toast.LENGTH_SHORT
                     ).show()
                 }
             } else {
                 RecyclerView.isVisible = true
                 btnCrearDirecion.isVisible = false
                 inicializarRecicle(
+                    TexviewIDRefDire,
                     RecyclerView,
                     context,
                     lista,
                     direccion,
                     refererencia,
                     latUSser,
-                    logUSer, precioDElivery, pagoDriver, total_Pagar
+                    logUSer,
+                    precioDElivery,
+                    pagoDriver,
+                    total_Pagar
                 )
             }
         }.addOnFailureListener { e ->
             Toast.makeText(
-                context,
-                "Error al buscar en trabajadores: ${e.message}",
-                Toast.LENGTH_SHORT
+                context, "Error al buscar en trabajadores: ${e.message}", Toast.LENGTH_SHORT
             ).show()
         }
     }
@@ -1004,6 +990,7 @@ object constantes_bottomShet_fourdItem {
     }
 
     private fun inicializarRecicle(
+        TexviewIDRefDire: TextView,
         recycle: RecyclerView,
         context: Context,
         items: MutableList<dataclassradiobtn>,
@@ -1021,6 +1008,7 @@ object constantes_bottomShet_fourdItem {
             refererencia.setText(ubicacionSeleccionada.referencia)
             latUSser.text = ubicacionSeleccionada.lat
             logUSer.text = ubicacionSeleccionada.log
+            TexviewIDRefDire.text = ubicacionSeleccionada.id
             precioDElivery.setText("")
             constantes_cotizacion_driver.setearDelivery(precioDElivery, context)
             pagoDriver.text = "***"
@@ -1113,33 +1101,36 @@ object constantes_bottomShet_fourdItem {
 
         if (bindingBottomShjet.camposPrincipales.nombreUser.text.isEmpty()) {
             bindingBottomShjet.camposPrincipales.nombreUser.error = "El campo de nombre está vacío"
-            Toast.makeText(context,"el campo de nombre esta vacio",Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "el campo de nombre esta vacio", Toast.LENGTH_SHORT).show()
             todosLosCamposValidos = false
         }
         if (bindingBottomShjet.camposPrincipales.apellidouser.text.isEmpty()) {
-            bindingBottomShjet.camposPrincipales.apellidouser.error = "El campo de apellido está vacío"
-            Toast.makeText(context,"el campo de apellido esta vacio",Toast.LENGTH_SHORT).show()
+            bindingBottomShjet.camposPrincipales.apellidouser.error =
+                "El campo de apellido está vacío"
+            Toast.makeText(context, "el campo de apellido esta vacio", Toast.LENGTH_SHORT).show()
             todosLosCamposValidos = false
         }
         if (bindingBottomShjet.camposPrincipales.dniUser.text.isEmpty()) {
             bindingBottomShjet.camposPrincipales.dniUser.error = "El campo de DNI está vacío"
-            Toast.makeText(context,"el campo de DNI esta vacio",Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "el campo de DNI esta vacio", Toast.LENGTH_SHORT).show()
             todosLosCamposValidos = false
         }
         if (bindingBottomShjet.camposPrincipales.numeroContacto.text.isEmpty()) {
-            bindingBottomShjet.camposPrincipales.numeroContacto.error = "El campo de número está vacío"
-            Toast.makeText(context,"el campo de número esta vacio",Toast.LENGTH_SHORT).show()
+            bindingBottomShjet.camposPrincipales.numeroContacto.error =
+                "El campo de número está vacío"
+            Toast.makeText(context, "el campo de número esta vacio", Toast.LENGTH_SHORT).show()
             todosLosCamposValidos = false
         }
         if (bindingBottomShjet.camposPrincipales.localidadUser.text.isEmpty()) {
-            bindingBottomShjet.camposPrincipales.localidadUser.error = "El campo de localidad está vacío"
-            Toast.makeText(context,"el campo de localidad esta vacio",Toast.LENGTH_SHORT).show()
+            bindingBottomShjet.camposPrincipales.localidadUser.error =
+                "El campo de localidad está vacío"
+            Toast.makeText(context, "el campo de localidad esta vacio", Toast.LENGTH_SHORT).show()
             todosLosCamposValidos = false
         }
 
         if (verificarHora && bindingBottomShjet.camposPrincipales.horareserva.text.isEmpty()) {
             bindingBottomShjet.camposPrincipales.horareserva.error = "El campo de hora está vacío"
-            Toast.makeText(context,"el campo de hora esta vacio",Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "el campo de hora esta vacio", Toast.LENGTH_SHORT).show()
             todosLosCamposValidos = false
         }
 
@@ -1210,9 +1201,8 @@ object constantes_bottomShet_fourdItem {
         Log.d("hoy", "el dia de hoy es $diasEnInglesAEs")
 
 
-        val horarioRef =
-            db.collection("Tiendas").document(storeId).collection("horario")
-                .document(diasEnInglesAEs.toString())
+        val horarioRef = db.collection("Tiendas").document(storeId).collection("horario")
+            .document(diasEnInglesAEs.toString())
 
         horarioRef.get().addOnSuccessListener { document ->
             if (document != null && document.exists()) {
@@ -1256,7 +1246,8 @@ object constantes_bottomShet_fourdItem {
                 }
 
                 if (metodoEntrega.isEmpty()) {
-                    Toast.makeText(context, "Seleccione su método de entrega", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Seleccione su método de entrega", Toast.LENGTH_SHORT)
+                        .show()
                     return
                 }
 
@@ -1304,9 +1295,7 @@ object constantes_bottomShet_fourdItem {
                         }
                     } else {
                         Toast.makeText(
-                            context,
-                            "error al realizar el envio",
-                            Toast.LENGTH_SHORT
+                            context, "error al realizar el envio", Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
@@ -1318,17 +1307,17 @@ object constantes_bottomShet_fourdItem {
     }
 
     private fun notificarCompraOReserva(
-        tipoProdutoOreser:String,
-        child:String,
+        tipoProdutoOreser: String,
+        child: String,
         idTienda: String,
         context: Context,
         idART: String,
         dataclasscompraReservaPromociones: dataclasscompra_reserva_promociones,
-        tipoChil1:String,
+        tipoChil1: String,
         tipoOperacion: String,
         enviado: (Boolean) -> Unit,
 
-    ) {
+        ) {
         firebaseAuth = FirebaseAuth.getInstance()
         val realtimeInstance = FirebaseDatabase.getInstance()
         val CompraTienda = realtimeInstance.getReference("CompraTienda").child(idTienda)
@@ -1338,78 +1327,69 @@ object constantes_bottomShet_fourdItem {
                 .child("tiendas").child(idTienda).child(tipoChil1).child(idART)
 
         val hashMap = hashMapOf<String, Any>(
-            "idDriver" to "",
             "idPedido" to idART,
+            "idTienda" to idTienda,
+            "idUser" to firebaseAuth.uid.toString(),
+            "idRef_user" to (dataclasscompraReservaPromociones.idRef_user ?: ""), // Se deja en null ya que es opcional
+
+            "metodoEntrega" to (dataclasscompraReservaPromociones.metodoEntrega.takeIf {
+                it?.isNotBlank() ?: false
+            } ?: "Delivery"),
+
+            "metodoPago" to dataclasscompraReservaPromociones.metodoPago.toString(),
+            "precioDelivery" to dataclasscompraReservaPromociones.totalDriver!!,  // Usamos Total_driver como precioDelivery
+
+            "productos" to dataclasscompraReservaPromociones.productos!!, // Aquí deberías pasar el JSON de los productos si es necesario
+
+            "tipoRealizado" to dataclasscompraReservaPromociones.tipoRealizado!!,
+            "totalCancelar" to dataclasscompraReservaPromociones.totalCancelar!!,
+            "totalDriver" to dataclasscompraReservaPromociones.totalDriver!!,
+            "totalProductos" to dataclasscompraReservaPromociones.totalProductos!!,
+
             "estado" to "pendiente",
             "estadoPedido" to "pendiente",
-            "metodoPago" to dataclasscompraReservaPromociones.metodoPAgo.toString(),
-            tipoProdutoOreser to dataclasscompraReservaPromociones.idproducto!!,
-            "metodoEntrega" to (dataclasscompraReservaPromociones.metodoEntrega.takeIf { it?.isNotBlank() ?: false } ?: "Delivery"),
-            "tipoRealizado" to dataclasscompraReservaPromociones.tipoRealizado!!,
 
-            "fecha" to dataclasscompraReservaPromociones.fechaActual!!,
-            "hora" to dataclasscompraReservaPromociones.horaActual!!,
-            "hora_llegada" to dataclasscompraReservaPromociones.horaReserva!!,
-
-            "idTienda" to idTienda,
-            "nombreTienda" to dataclasscompraReservaPromociones.nombreTienda!!,
-            "localidadTienda" to dataclasscompraReservaPromociones.localidadTienda!!,
-            "tipoTienda" to dataclasscompraReservaPromociones.tipoTienda!!,
-
-            "idUSer" to firebaseAuth.uid.toString(),
-            "nombre" to dataclasscompraReservaPromociones.nombre!!,
-            "apellido" to dataclasscompraReservaPromociones.apellido!!,
-            "numero" to dataclasscompraReservaPromociones.numero!!,
-            "localidad" to dataclasscompraReservaPromociones.localidadus!!,
-            "referencia" to (dataclasscompraReservaPromociones.referenciaEntrega.takeIf { it?.isNotBlank() ?: false } ?: ""),
-            "direccion" to (dataclasscompraReservaPromociones.direcionEntrega.takeIf { it?.isNotBlank() ?: false } ?: ""),
-            "dni" to dataclasscompraReservaPromociones.dni!!,
-
-            "totalDriver" to dataclasscompraReservaPromociones.Total_driver!!,
-            "tituloProducto" to dataclasscompraReservaPromociones.tituloProducto!!,
-            "totalProductos" to dataclasscompraReservaPromociones.Precio_producto!!,
-            "Total_item_selecionado" to dataclasscompraReservaPromociones.Total_item_selecionado!!,
-            "tipoReserva" to dataclasscompraReservaPromociones.tipoReserva!!,
-            "precioDelivery" to dataclasscompraReservaPromociones.Total_driver!!,
-            "totalCancelar" to dataclasscompraReservaPromociones.totalApagar!!,
+            "fecha" to dataclasscompraReservaPromociones.fecha!!,
+            "hora" to dataclasscompraReservaPromociones.hora!!,
+            "hora_entrega_llegada" to (dataclasscompraReservaPromociones.hora_entrega_llegada?: ""),
+            "fecha_entrega_llegada" to (dataclasscompraReservaPromociones.fecha_entrega_llegada ?: ""),
 
 
 
+            "idDriver" to "" // Se deja vacío si no hay ID asignado
         )
 
-        PedidosUsuario.setValue(hashMap)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Operación realizada correctamente", Toast.LENGTH_SHORT)
-                    .show()
-                constantes.obtnerTokenTienda(idTienda) { token ->
-                    GlobalScope.launch {
-                        val enviar_notificaciones = NotificacionRS()
-                        enviar_notificaciones.sendNotification_con_parametros(
-                            "IDTienda",
-                            idTienda,
-                            "INICIO",
-                            context,
-                            token,
-                            "Operación de $tipoOperacion: ${dataclasscompraReservaPromociones.tituloProducto}",
-                            "Tienes una nueva operación de $tipoOperacion. Haz clic para aceptar o rechazar la operación"
-                        )
-                    }
-                    enviado(true)
-                }
-            }.addOnFailureListener {
-                enviado(false)
-                Toast.makeText(context, "Error al realizar la operación", Toast.LENGTH_SHORT).show()
-            }
 
-        CompraTienda.setValue(hashMap)
-            .addOnSuccessListener {
+        PedidosUsuario.setValue(hashMap).addOnSuccessListener {
+            Toast.makeText(context, "Operación realizada correctamente", Toast.LENGTH_SHORT)
+                .show()
+            constantes.obtnerTokenTienda(idTienda) { token ->
+                GlobalScope.launch {
+                    val enviar_notificaciones = NotificacionRS()
+                    enviar_notificaciones.sendNotification_con_parametros(
+                        "IDTienda",
+                        idTienda,
+                        "INICIO",
+                        context,
+                        token,
+                        "Operación de $tipoOperacion: ${dataclasscompraReservaPromociones.idPedido}",
+                        "Tienes una nueva operación de $tipoOperacion. Haz clic para aceptar o rechazar la operación"
+                    )
+                }
                 enviado(true)
-                Log.d("operacion_$tipoOperacion", "Operación realizada correctamente")
             }
-            .addOnFailureListener {
-                enviado(false)
-                Log.d("operacion_$tipoOperacion", "Error al realizar la operación")
-            }
+        }.addOnFailureListener {
+            enviado(false)
+            Toast.makeText(context, "Error al realizar la operación", Toast.LENGTH_SHORT).show()
+        }
+
+        CompraTienda.setValue(hashMap).addOnSuccessListener {
+            enviado(true)
+            Log.d("operacion_$tipoOperacion", "Operación realizada correctamente")
+        }.addOnFailureListener {
+            enviado(false)
+            Log.d("operacion_$tipoOperacion", "Error al realizar la operación")
+        }
     }
 
 

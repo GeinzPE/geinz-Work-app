@@ -220,10 +220,6 @@
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\activity_direccion_entrega_lat_log.xml"
     },
     {
-        "merged": "com.geinzz.geinzwork.app-mergeDebugResources-55:/layout/activity_vista_tienda.xml",
-        "source": "com.geinzz.geinzwork.app-main-58:/layout/activity_vista_tienda.xml"
-    },
-    {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-mergeDebugResources-55:\\layout\\activity_vistas_anuncios_general.xml",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\activity_vistas_anuncios_general.xml"
     },
@@ -476,6 +472,10 @@
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\include_metodos_pago.xml"
     },
     {
+        "merged": "com.geinzz.geinzwork.app-mergeDebugResources-55:/layout/include_direccion_envios.xml",
+        "source": "com.geinzz.geinzwork.app-main-58:/layout/include_direccion_envios.xml"
+    },
+    {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-mergeDebugResources-55:\\layout\\bottom_sheet_mostrar_productos.xml",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\bottom_sheet_mostrar_productos.xml"
     },
@@ -696,12 +696,12 @@
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\bottom_sheet_renovar_verificacion.xml"
     },
     {
-        "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-mergeDebugResources-55:\\layout\\fragment_sin_internet.xml",
-        "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\fragment_sin_internet.xml"
-    },
-    {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-mergeDebugResources-55:\\layout\\radio_btn_direcion_envios.xml",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\radio_btn_direcion_envios.xml"
+    },
+    {
+        "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-mergeDebugResources-55:\\layout\\fragment_sin_internet.xml",
+        "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\fragment_sin_internet.xml"
     },
     {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-mergeDebugResources-55:\\layout\\recicle_trabajos.xml",
