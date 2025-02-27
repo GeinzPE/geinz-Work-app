@@ -559,7 +559,7 @@ object constantes_bottomShet_fourdItem {
         dialog.setContentView(view)
     }
 
-    private fun convertirJSON(
+    fun convertirJSON(
         idClikado: String,
         PrecioItem: Double,
         cantidad: Int? = null,

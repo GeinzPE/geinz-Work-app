@@ -111,7 +111,7 @@ class confirmacion_de_compra_tienda : AppCompatActivity() {
                     precioDelivery = precioDriverVeri,
                     productos = listaProductoss, // Asegúrate de que este campo sea un `String` si es necesario
 
-                    tipoRealizado = "compra carrito",
+                    tipoRealizado = "compra_carrito",
                     totalCancelar = TotalPagar.toDouble(),
                     totalDriver = precioDriverVeri,
                     totalProductos = totalProductos.toDouble(),

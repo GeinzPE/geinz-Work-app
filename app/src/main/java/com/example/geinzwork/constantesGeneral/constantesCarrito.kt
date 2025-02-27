@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.geinzwork.NotificacionRS
+import com.example.geinzwork.constantesGeneral.constantes_bottomShet_fourdItem
 import com.geinzz.geinzwork.R
 import com.geinzz.geinzwork.adapterViewholder.adapterHistorial
 import com.geinzz.geinzwork.adapterViewholder.adapterReservaSevicios
@@ -81,11 +82,12 @@ object constantesCarrito {
             "idRef_user" to dataclassCarritoCompra.idRef_user.toString(),
 
             // Totales para cancelar
-            "precioDelivery" to dataclassCarritoCompra.precioDelivery.toString(),
-            "totalCancelar" to dataclassCarritoCompra.totalCancelar.toString(),
-            "totalDriver" to dataclassCarritoCompra.totalDriver.toString(),
-            "totalProductos" to dataclassCarritoCompra.totalProductos.toString(),
-
+            "precioDelivery" to dataclassCarritoCompra.precioDelivery.toString().toDouble(),
+            "totalCancelar" to dataclassCarritoCompra.totalCancelar.toString().toDouble(),
+            "totalDriver" to dataclassCarritoCompra.totalDriver.toString().toDouble(),
+            "totalProductos" to dataclassCarritoCompra.totalProductos.toString().toDouble(),
+            "fecha_entrega_llegada" to "",
+            "hora_entrega_llegada" to "",
             // Fecha y hora
             "fecha" to dataclassCarritoCompra.fecha.toString(),
             "hora" to dataclassCarritoCompra.hora.toString(),
@@ -94,8 +96,10 @@ object constantesCarrito {
             "idTienda" to dataclassCarritoCompra.idTienda.toString(),
 
             // Información del usuario
-            "idUSer" to dataclassCarritoCompra.idUser.toString(),
-            "metodoEntrega" to (dataclassCarritoCompra.metodoEntrega.takeIf { it?.isNotBlank() ?: false } ?: "Delivery"),
+            "idUser" to dataclassCarritoCompra.idUser.toString(),
+            "metodoEntrega" to (dataclassCarritoCompra.metodoEntrega.takeIf {
+                it?.isNotBlank() ?: false
+            } ?: "Delivery"),
         )
 
         reaaltime.setValue(hashMapCompra)
@@ -169,36 +173,44 @@ object constantesCarrito {
             FirebaseDatabase.getInstance().getReference("CompraTienda").child(idTienda).child(
                 firebaseAuth.uid.toString()
             ).child("reserva").child(codigoReserva)
-        val hashMapCompra = hashMapOf<String, Any>(
-            "hora_llegada" to horallegada,
-            "fecha_llegada" to fechaLlegada,
-            "tipoReserva" to "Reserva Servicios",
-            "estado" to "Pendiente",
-            "deliveryPrecio" to "0.0",
-            "idPedido" to codigoReserva,
-            "precioServicio" to precioServicio,
-            "nombre" to nombreUser,
-            "idTienda" to idTienda,
-            "fecha" to fecha,
-            "hora" to hora,
-            "apellido" to apellido,
-            "dni" to dni,
-            "numero" to numero,
-            "metodoPago" to metodopago,
-            "nombre_servicio" to tipoSerivicio,
-            "idReservaPedido" to idServico,
-            "totalCancelar" to total,
+        constantes_bottomShet_fourdItem.convertirJSON(
+            idServico,
+            precioServicio.toDouble(),
+            1
+        ) { json ->
 
-        )
-        reaaltime.setValue(hashMapCompra).addOnSuccessListener {
-            Toast.makeText(context, "reserva exitosamente ", Toast.LENGTH_SHORT).show()
-            realtimeTienda.setValue(hashMapCompra).addOnSuccessListener {
+            val hashMapCompra = hashMapOf<String, Any>(
+                "estado" to "pendiente",
+                "estadoPedido" to "pendiente",
+                "fecha" to fecha,
+                "fecha_entrega_llegada" to fechaLlegada,
+                "hora" to hora,
+                "hora_entrega_llegada" to horallegada,
+                "idDriver" to "",
+                "idPedido" to codigoReserva,
+                "idRef_user" to "",
+                "idTienda" to idTienda,
+                "idUser" to firebaseAuth.uid.toString(),
+                "metodoEntrega" to "",
+                "metodoPago" to metodopago,
+                "precioDelivery" to 0,
+                "productos" to json,
+                "tipoRealizado" to "reserva_servicios",
+                "totalCancelar" to total.toDouble(),
+                "totalDriver" to 0,
+                "totalProductos" to total.toDouble(),
+            )
+            reaaltime.setValue(hashMapCompra).addOnSuccessListener {
                 Toast.makeText(context, "reserva exitosamente ", Toast.LENGTH_SHORT).show()
+                realtimeTienda.setValue(hashMapCompra).addOnSuccessListener {
+                    Toast.makeText(context, "reserva exitosamente ", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+                    Toast.makeText(context, "error al reservar el servicio", Toast.LENGTH_SHORT)
+                        .show()
+                }
             }.addOnFailureListener {
                 Toast.makeText(context, "error al reservar el servicio", Toast.LENGTH_SHORT).show()
             }
-        }.addOnFailureListener {
-            Toast.makeText(context, "error al reservar el servicio", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -221,7 +233,8 @@ object constantesCarrito {
                     for (tiendaSnapshot in dataSnapshot.children) {
                         val idTienda = tiendaSnapshot.key
                         // Obtener compras de la tienda actual
-                        val comprasRef = database.getReference("PedidosUsuario/$userId/tiendas/$idTienda/reserva")
+                        val comprasRef =
+                            database.getReference("PedidosUsuario/$userId/tiendas/$idTienda/reserva")
                         comprasRef.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(comprasSnapshot: DataSnapshot) {
                                 for (compraSnapshot in comprasSnapshot.children) {
@@ -274,8 +287,10 @@ object constantesCarrito {
                                             .getValue(String::class.java),
 
                                         // Otros datos
-                                        totaPAgar = compraSnapshot.child( "totalCancelar").getValue(String::class.java),
-                                        cantidad= compraSnapshot.child( "Total_item_selecionado").getValue(String::class.java),
+                                        totaPAgar = compraSnapshot.child("totalCancelar")
+                                            .getValue(String::class.java),
+                                        cantidad = compraSnapshot.child("Total_item_selecionado")
+                                            .getValue(String::class.java),
                                     )
 
                                     if (shouldAddToservicios(filtrado, historialServicio)) {
@@ -374,12 +389,14 @@ object constantesCarrito {
 
             usuarioRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    var nuevaListaHistorial = listaHistorial.toMutableList()  // Convertir a lista mutable
+                    var nuevaListaHistorial =
+                        listaHistorial.toMutableList()  // Convertir a lista mutable
                     val nombresTiendas = mutableSetOf<String>()  // Usar un Set para nombres únicos
 
                     dataSnapshot.children.forEach { tiendaSnapshot ->
                         val idTienda = tiendaSnapshot.key ?: return@forEach
-                        val comprasRef = database.getReference("PedidosUsuario/$userId/tiendas/$idTienda/compra")
+                        val comprasRef =
+                            database.getReference("PedidosUsuario/$userId/tiendas/$idTienda/compra")
 
                         comprasRef.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(comprasSnapshot: DataSnapshot) {
@@ -387,32 +404,58 @@ object constantesCarrito {
                                     val historial = dataclassHistorial(
                                         latitud = 1231, // Reemplaza con datos reales si están disponibles
                                         longitud = 123, // Reemplaza con datos reales si están disponibles
-                                        direccion = compraSnapshot.child("direccion").getValue(String::class.java),
-                                        estadp = compraSnapshot.child("estado").getValue(String::class.java),
-                                        fecha = compraSnapshot.child("fecha").getValue(String::class.java),
-                                        hora = compraSnapshot.child("hora").getValue(String::class.java),
-                                        idPedido = compraSnapshot.child("idPedido").getValue(String::class.java),
-                                        idTienda = compraSnapshot.child("idTienda").getValue(String::class.java),
-                                        iduser = compraSnapshot.child("idUSer").getValue(String::class.java),
-                                        metodoentrega = compraSnapshot.child("metodoEntrega").getValue(String::class.java),
-                                        metodoPago = compraSnapshot.child("metodoPago").getValue(String::class.java),
-                                        nombre = compraSnapshot.child("nombre").getValue(String::class.java),
-                                        productos = compraSnapshot.child("productos").getValue(String::class.java),
-                                        numero = compraSnapshot.child("numero").getValue(String::class.java),
-                                        nombreTienda = compraSnapshot.child("nombreTienda").getValue(String::class.java),
-                                        localidadTienda = compraSnapshot.child("localidadTienda").getValue(String::class.java),
-                                        localidadUSer = compraSnapshot.child("localidad").getValue(String::class.java),
-                                        descipcion = compraSnapshot.child("descipcion").getValue(String::class.java),
-                                        tipoTienda = compraSnapshot.child("tipoTienda").getValue(String::class.java),
-                                        estadoPedido = compraSnapshot.child("estadoPedido").getValue(String::class.java),
-                                        idDriver = compraSnapshot.child("idDriver").getValue(String::class.java),
-                                        total = compraSnapshot.child("totalCancelar").getValue(String::class.java),
-                                        precioDelivery = compraSnapshot.child("precioDelivery").getValue(String::class.java),
-                                        referencia = compraSnapshot.child("referencia").getValue(String::class.java),
-                                        totalDriver = compraSnapshot.child("totalDriver").getValue(String::class.java),
-                                        totalProductos = compraSnapshot.child("totalProductos").getValue(String::class.java),
-                                        tipoRealizado = compraSnapshot.child("tipoRealizado").getValue(String::class.java),
-                                        totalItems = compraSnapshot.child("Total_item_selecionado").getValue(String::class.java),
+                                        direccion = compraSnapshot.child("direccion")
+                                            .getValue(String::class.java),
+                                        estadp = compraSnapshot.child("estado")
+                                            .getValue(String::class.java),
+                                        fecha = compraSnapshot.child("fecha")
+                                            .getValue(String::class.java),
+                                        hora = compraSnapshot.child("hora")
+                                            .getValue(String::class.java),
+                                        idPedido = compraSnapshot.child("idPedido")
+                                            .getValue(String::class.java),
+                                        idTienda = compraSnapshot.child("idTienda")
+                                            .getValue(String::class.java),
+                                        iduser = compraSnapshot.child("idUSer")
+                                            .getValue(String::class.java),
+                                        metodoentrega = compraSnapshot.child("metodoEntrega")
+                                            .getValue(String::class.java),
+                                        metodoPago = compraSnapshot.child("metodoPago")
+                                            .getValue(String::class.java),
+                                        nombre = compraSnapshot.child("nombre")
+                                            .getValue(String::class.java),
+                                        productos = compraSnapshot.child("productos")
+                                            .getValue(String::class.java),
+                                        numero = compraSnapshot.child("numero")
+                                            .getValue(String::class.java),
+                                        nombreTienda = compraSnapshot.child("nombreTienda")
+                                            .getValue(String::class.java),
+                                        localidadTienda = compraSnapshot.child("localidadTienda")
+                                            .getValue(String::class.java),
+                                        localidadUSer = compraSnapshot.child("localidad")
+                                            .getValue(String::class.java),
+                                        descipcion = compraSnapshot.child("descipcion")
+                                            .getValue(String::class.java),
+                                        tipoTienda = compraSnapshot.child("tipoTienda")
+                                            .getValue(String::class.java),
+                                        estadoPedido = compraSnapshot.child("estadoPedido")
+                                            .getValue(String::class.java),
+                                        idDriver = compraSnapshot.child("idDriver")
+                                            .getValue(String::class.java),
+                                        total = compraSnapshot.child("totalCancelar")
+                                            .getValue(String::class.java),
+                                        precioDelivery = compraSnapshot.child("precioDelivery")
+                                            .getValue(String::class.java),
+                                        referencia = compraSnapshot.child("referencia")
+                                            .getValue(String::class.java),
+                                        totalDriver = compraSnapshot.child("totalDriver")
+                                            .getValue(String::class.java),
+                                        totalProductos = compraSnapshot.child("totalProductos")
+                                            .getValue(String::class.java),
+                                        tipoRealizado = compraSnapshot.child("tipoRealizado")
+                                            .getValue(String::class.java),
+                                        totalItems = compraSnapshot.child("Total_item_selecionado")
+                                            .getValue(String::class.java),
                                     )
 
                                     // Filtrar y agregar a lista y set
@@ -422,14 +465,24 @@ object constantesCarrito {
                                             "todos" -> {
                                                 historial.nombreTienda?.let { nombresTiendas.add(it) }
                                             }
+
                                             "carrito" -> {
                                                 if (historial.tipoRealizado == "compra carrito") {
-                                                    historial.nombreTienda?.let { nombresTiendas.add(it) }
+                                                    historial.nombreTienda?.let {
+                                                        nombresTiendas.add(
+                                                            it
+                                                        )
+                                                    }
                                                 }
                                             }
+
                                             "promociones" -> {
                                                 if (historial.tipoRealizado == "compra de promociones") {
-                                                    historial.nombreTienda?.let { nombresTiendas.add(it) }
+                                                    historial.nombreTienda?.let {
+                                                        nombresTiendas.add(
+                                                            it
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
@@ -443,7 +496,10 @@ object constantesCarrito {
                             }
 
                             override fun onCancelled(databaseError: DatabaseError) {
-                                Log.e("TAG", "Error al obtener las compras de la tienda $idTienda: ${databaseError.message}")
+                                Log.e(
+                                    "TAG",
+                                    "Error al obtener las compras de la tienda $idTienda: ${databaseError.message}"
+                                )
                                 totalEncontrado("0")
                             }
                         })
@@ -451,7 +507,10 @@ object constantesCarrito {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("TAG", "Error al obtener las tiendas del usuario: ${databaseError.message}")
+                    Log.e(
+                        "TAG",
+                        "Error al obtener las tiendas del usuario: ${databaseError.message}"
+                    )
                     totalEncontrado("0")
                 }
             })
@@ -489,7 +548,8 @@ object constantesCarrito {
                         val comprasSnapshot = tiendaSnapshot.child("compra")
 
                         comprasSnapshot.children.forEach { compraSnapshot ->
-                            val tipoRealizado = compraSnapshot.child("tipoRealizado").getValue(String::class.java)
+                            val tipoRealizado =
+                                compraSnapshot.child("tipoRealizado").getValue(String::class.java)
                             val esValido = when (filtro) {
                                 "todos" -> true
                                 "carrito" -> tipoRealizado == "compra carrito"
@@ -501,32 +561,57 @@ object constantesCarrito {
                                 val historial = dataclassHistorial(
                                     latitud = 1231,
                                     longitud = 123,
-                                    direccion = compraSnapshot.child("direccion").getValue(String::class.java),
-                                    estadp = compraSnapshot.child("estado").getValue(String::class.java),
-                                    fecha = compraSnapshot.child("fecha").getValue(String::class.java),
-                                    hora = compraSnapshot.child("hora").getValue(String::class.java),
-                                    idPedido = compraSnapshot.child("idPedido").getValue(String::class.java),
-                                    idTienda = compraSnapshot.child("idTienda").getValue(String::class.java),
-                                    iduser = compraSnapshot.child("idUSer").getValue(String::class.java),
-                                    metodoentrega = compraSnapshot.child("metodoEntrega").getValue(String::class.java),
-                                    metodoPago = compraSnapshot.child("metodoPago").getValue(String::class.java),
-                                    nombre = compraSnapshot.child("nombre").getValue(String::class.java),
-                                    productos = compraSnapshot.child("productos").getValue(String::class.java),
-                                    numero = compraSnapshot.child("numero").getValue(String::class.java),
-                                    nombreTienda = compraSnapshot.child("nombreTienda").getValue(String::class.java),
-                                    localidadTienda = compraSnapshot.child("localidadTienda").getValue(String::class.java),
-                                    localidadUSer = compraSnapshot.child("localidad").getValue(String::class.java),
-                                    descipcion = compraSnapshot.child("descipcion").getValue(String::class.java),
-                                    tipoTienda = compraSnapshot.child("tipoTienda").getValue(String::class.java),
-                                    estadoPedido = compraSnapshot.child("estado").getValue(String::class.java),
-                                    idDriver = compraSnapshot.child("idDriver").getValue(String::class.java),
-                                    total = compraSnapshot.child("totalCancelar").getValue(String::class.java),
-                                    precioDelivery = compraSnapshot.child("precioDelivery").getValue(String::class.java),
-                                    referencia = compraSnapshot.child("referencia").getValue(String::class.java),
-                                    totalDriver = compraSnapshot.child("totalDriver").getValue(String::class.java),
-                                    totalProductos = compraSnapshot.child("totalProductos").getValue(String::class.java),
+                                    direccion = compraSnapshot.child("direccion")
+                                        .getValue(String::class.java),
+                                    estadp = compraSnapshot.child("estado")
+                                        .getValue(String::class.java),
+                                    fecha = compraSnapshot.child("fecha")
+                                        .getValue(String::class.java),
+                                    hora = compraSnapshot.child("hora")
+                                        .getValue(String::class.java),
+                                    idPedido = compraSnapshot.child("idPedido")
+                                        .getValue(String::class.java),
+                                    idTienda = compraSnapshot.child("idTienda")
+                                        .getValue(String::class.java),
+                                    iduser = compraSnapshot.child("idUSer")
+                                        .getValue(String::class.java),
+                                    metodoentrega = compraSnapshot.child("metodoEntrega")
+                                        .getValue(String::class.java),
+                                    metodoPago = compraSnapshot.child("metodoPago")
+                                        .getValue(String::class.java),
+                                    nombre = compraSnapshot.child("nombre")
+                                        .getValue(String::class.java),
+                                    productos = compraSnapshot.child("productos")
+                                        .getValue(String::class.java),
+                                    numero = compraSnapshot.child("numero")
+                                        .getValue(String::class.java),
+                                    nombreTienda = compraSnapshot.child("nombreTienda")
+                                        .getValue(String::class.java),
+                                    localidadTienda = compraSnapshot.child("localidadTienda")
+                                        .getValue(String::class.java),
+                                    localidadUSer = compraSnapshot.child("localidad")
+                                        .getValue(String::class.java),
+                                    descipcion = compraSnapshot.child("descipcion")
+                                        .getValue(String::class.java),
+                                    tipoTienda = compraSnapshot.child("tipoTienda")
+                                        .getValue(String::class.java),
+                                    estadoPedido = compraSnapshot.child("estado")
+                                        .getValue(String::class.java),
+                                    idDriver = compraSnapshot.child("idDriver")
+                                        .getValue(String::class.java),
+                                    total = compraSnapshot.child("totalCancelar")
+                                        .getValue(String::class.java),
+                                    precioDelivery = compraSnapshot.child("precioDelivery")
+                                        .getValue(String::class.java),
+                                    referencia = compraSnapshot.child("referencia")
+                                        .getValue(String::class.java),
+                                    totalDriver = compraSnapshot.child("totalDriver")
+                                        .getValue(String::class.java),
+                                    totalProductos = compraSnapshot.child("totalProductos")
+                                        .getValue(String::class.java),
                                     tipoRealizado = tipoRealizado,
-                                    totalItems = compraSnapshot.child("Total_item_selecionado").getValue(String::class.java),
+                                    totalItems = compraSnapshot.child("Total_item_selecionado")
+                                        .getValue(String::class.java),
                                 )
 
                                 // Agregar el historial a la nueva lista usando `plus`
@@ -543,12 +628,18 @@ object constantesCarrito {
                     // Inicializar el RecyclerView con la lista filtrada
                     inicializarLista(listaFiltrada, recile, context)
 
-                    Log.d("FiltradoHistorial", "Total de elementos filtrados: ${listaFiltrada.size}")
+                    Log.d(
+                        "FiltradoHistorial",
+                        "Total de elementos filtrados: ${listaFiltrada.size}"
+                    )
                     encontrado(listaFiltrada.size.toString())
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("TAG", "Error al obtener las tiendas del usuario: ${databaseError.message}")
+                    Log.e(
+                        "TAG",
+                        "Error al obtener las tiendas del usuario: ${databaseError.message}"
+                    )
                     encontrado("0")
                 }
             })
@@ -556,7 +647,6 @@ object constantesCarrito {
             Log.e("TAG", "El usuario actual no está autenticado.")
         }
     }
-
 
 
     fun pasaFiltroHistorial(
@@ -1031,7 +1121,7 @@ object constantesCarrito {
     }
 
     fun setearDatosUsuario(callback: (String?, String?, String?, String?) -> Unit) {
-        val idPAsado=FirebaseAuth.getInstance().uid.toString()
+        val idPAsado = FirebaseAuth.getInstance().uid.toString()
         val firestore = FirebaseFirestore.getInstance()
         val usuariosRef = firestore.collection("Trabajadores_Usuarios_Drivers")
             .document("trabajadores").collection("trabajadores")
@@ -1085,7 +1175,7 @@ object constantesCarrito {
             }
     }
 
-    fun setearDatosUsuarioImgNombre(idUSer:String,callback: (String?, String?, String?) -> Unit) {
+    fun setearDatosUsuarioImgNombre(idUSer: String, callback: (String?, String?, String?) -> Unit) {
 
         val firestore = FirebaseFirestore.getInstance()
         val usuariosRef = firestore.collection("Trabajadores_Usuarios_Drivers")
@@ -1112,7 +1202,7 @@ object constantesCarrito {
                                 val nombre = datos.getString("nombre")
                                 val imagenPerfil = datos.getString("imagenPerfil")
                                 val apellido = datos.getString("apellido")
-                                callback(nombre, imagenPerfil,  apellido)
+                                callback(nombre, imagenPerfil, apellido)
                             } else {
                                 // Si no se encuentra en ninguna de las colecciones
                                 callback(null, null, null)
@@ -1137,7 +1227,6 @@ object constantesCarrito {
                 callback(null, null, null)
             }
     }
-
 
 
     fun retornarIDTienda(callback: (List<String>) -> Unit) {
