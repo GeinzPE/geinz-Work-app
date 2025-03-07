@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.example.geinzwork.constantesGeneral.Variables
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
 import com.geinzz.geinzwork.R
 import com.geinzz.geinzwork.databinding.ActivityEditarPublicacionesBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -36,15 +38,10 @@ class editar_publicaciones : AppCompatActivity() {
 
         binding.tituloPublicacionED.setText(titulo)
         binding.descripcionServiciosED.setText(descripcion)
-        try {
-            Glide.with(this)
-                .load(img)
-                .into(binding.imagenTrabajo)
-        } catch (e: Exception) {
-            println("error al setear la img")
-        }
+
         binding.editar.setOnClickListener {
-            editar_info(idPublicacion,
+            editar_info(
+                idPublicacion,
                 binding.tituloPublicacionED.text.toString(),
                 binding.descripcionServiciosED.text.toString()
             )
@@ -71,9 +68,20 @@ class editar_publicaciones : AppCompatActivity() {
                     ).show()
                 }
         }
+
+        val placeholderperfil = ContextCompat.getDrawable(this, R.drawable.cargando_img)
+        constatnes_carga_imagenes_general.changer_img(
+            binding.progressCargaImagen,
+            this,
+            img,
+            null,
+            binding.imagenTrabajo,
+            "portada", placeholderperfil
+        )
+
     }
 
-    private fun editar_info(idPublicacion:String,nuevoTitulo: String, nuevaDescripcion: String) {
+    private fun editar_info(idPublicacion: String, nuevoTitulo: String, nuevaDescripcion: String) {
 
         val db = FirebaseFirestore.getInstance().collection(Variables.trabajadores_usuariosDB)
             .document(Variables.trabajadoresDB)

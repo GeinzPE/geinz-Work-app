@@ -4,10 +4,12 @@ import android.content.Context
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.widget.LinearLayoutCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
 import com.geinzz.geinzwork.R
 import com.geinzz.geinzwork.adapterViewholder.adapter
 import com.geinzz.geinzwork.adapterViewholder.adapterCategorias
@@ -16,6 +18,7 @@ import com.geinzz.geinzwork.databinding.FragmentInicioFracmentBinding
 import com.geinzz.geinzwork.databinding.ItemInicioFragmentUsersBinding
 import com.geinzz.geinzwork.dataclass.dataClassTrabajosd
 import com.geinzz.geinzwork.dataclass.dataclassTiendas
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
@@ -90,15 +93,15 @@ object constantesTrabajadoresTiendasInicioFragmet {
                     )
                 } else {
                     binding.includeTrabajadoresTop.noEncontrado.isVisible = true
-                    binding.includeTrabajadoresTop.trabajadores.isVisible=false
+                    binding.includeTrabajadoresTop.trabajadores.isVisible = false
                 }
                 actualizarVisibilidadCargando(false, binding, binding.loading)
             }
             .addOnFailureListener {
                 // Manejar error
-                actualizarVisibilidadCargando(false, binding,  binding.loading)
+                actualizarVisibilidadCargando(false, binding, binding.loading)
                 binding.includeTrabajadoresTop.noEncontrado.isVisible = true
-                binding.includeTrabajadoresTop.trabajadores.isVisible=false
+                binding.includeTrabajadoresTop.trabajadores.isVisible = false
             }
     }
 
@@ -110,7 +113,6 @@ object constantesTrabajadoresTiendasInicioFragmet {
         binding.includeTrabajadoresTop.progressvar.isVisible = cargando
         loadingView.isVisible = cargando
     }
-
 
 
     fun obtenerTrabajoscategoria(
@@ -190,21 +192,56 @@ object constantesTrabajadoresTiendasInicioFragmet {
                 // Al finalizar el procesamiento de todos los documentos
                 if (remainingQueries == 0) {
                     // Inicializar los RecyclerView
-                    inicializarTrabajos(binding.includeRecicleViewsalud.trabajadores, usuariosMedicina, contexto)
-                    inicializarTrabajos(binding.includeReciclehogar.trabajadores, usuariosTrabajoHogar, contexto)
-                    inicializarTrabajos(binding.includeRecicleViewddelivery.trabajadores, usauriosconductoresDelivery, contexto)
-                    inicializarTrabajos(binding.includeRecicleTecnicos.trabajadores, usuariosTecnicos, contexto)
-                    inicializarTrabajos(binding.includeReciclemecanico.trabajadores, usauriosMecanica, contexto)
+                    inicializarTrabajos(
+                        binding.includeRecicleViewsalud.trabajadores,
+                        usuariosMedicina,
+                        contexto
+                    )
+                    inicializarTrabajos(
+                        binding.includeReciclehogar.trabajadores,
+                        usuariosTrabajoHogar,
+                        contexto
+                    )
+                    inicializarTrabajos(
+                        binding.includeRecicleViewddelivery.trabajadores,
+                        usauriosconductoresDelivery,
+                        contexto
+                    )
+                    inicializarTrabajos(
+                        binding.includeRecicleTecnicos.trabajadores,
+                        usuariosTecnicos,
+                        contexto
+                    )
+                    inicializarTrabajos(
+                        binding.includeReciclemecanico.trabajadores,
+                        usauriosMecanica,
+                        contexto
+                    )
 
                     // Actualizar visibilidad de las secciones basadas en si hay datos o no
-                    actualizarVisibilidadPorCategoria(binding.includeRecicleViewsalud, usuariosMedicina)
-                    actualizarVisibilidadPorCategoria(binding.includeReciclehogar, usuariosTrabajoHogar)
-                    actualizarVisibilidadPorCategoria(binding.includeRecicleViewddelivery, usauriosconductoresDelivery)
-                    actualizarVisibilidadPorCategoria(binding.includeRecicleTecnicos, usuariosTecnicos)
-                    actualizarVisibilidadPorCategoria(binding.includeReciclemecanico, usauriosMecanica)
+                    actualizarVisibilidadPorCategoria(
+                        binding.includeRecicleViewsalud,
+                        usuariosMedicina
+                    )
+                    actualizarVisibilidadPorCategoria(
+                        binding.includeReciclehogar,
+                        usuariosTrabajoHogar
+                    )
+                    actualizarVisibilidadPorCategoria(
+                        binding.includeRecicleViewddelivery,
+                        usauriosconductoresDelivery
+                    )
+                    actualizarVisibilidadPorCategoria(
+                        binding.includeRecicleTecnicos,
+                        usuariosTecnicos
+                    )
+                    actualizarVisibilidadPorCategoria(
+                        binding.includeReciclemecanico,
+                        usauriosMecanica
+                    )
 
                     // Ocultar loading y mostrar los resultados
-                    actualizarVisibilidad(true, binding.loading,  binding.containerGeneral)
+                    actualizarVisibilidad(true, binding.loading, binding.containerGeneral)
                 }
             }
         }.addOnFailureListener {
@@ -214,7 +251,10 @@ object constantesTrabajadoresTiendasInicioFragmet {
         }
     }
 
-    fun actualizarVisibilidadPorCategoria(sectionView: ItemInicioFragmentUsersBinding, usuarios: List<dataClassTrabajosd>) {
+    fun actualizarVisibilidadPorCategoria(
+        sectionView: ItemInicioFragmentUsersBinding,
+        usuarios: List<dataClassTrabajosd>
+    ) {
         if (usuarios.isEmpty()) {
             sectionView.noEncontrado.isVisible = true
             sectionView.progressvar.isVisible = false
@@ -276,16 +316,24 @@ object constantesTrabajadoresTiendasInicioFragmet {
     }
 
 
-    fun obtenerNombre_imgPerfil(TextView: TextView, contexto: Context, imagen: CircleImageView) {
+    fun obtenerNombre_imgPerfil(
+        progressbar: CircularProgressIndicator,
+        TextView: TextView,
+        contexto: Context,
+        imagen: CircleImageView
+    ) {
         if (constantes.firebaseAuth.currentUser == null) {
+            val placeholderperfil =
+                ContextCompat.getDrawable(contexto, R.drawable.img_perfil)
             TextView.text = "usuario"
-            try {
-                Glide.with(contexto)
-                    .load(R.drawable.img_perfil)
-                    .into(imagen)
-            } catch (e: Exception) {
-                println("error al setear la img")
-            }
+            constatnes_carga_imagenes_general.changer_img(
+                progressbar,
+                contexto,
+                img,
+                imagen,
+                null,
+                "perfil", placeholderperfil
+            )
         } else {
             var encontrado = false
             val db = FirebaseFirestore.getInstance().collection("Trabajadores_Usuarios_Drivers")
@@ -297,7 +345,14 @@ object constantesTrabajadoresTiendasInicioFragmet {
                     val id = data?.get("id") as? String
                     if (id == constantes.firebaseAuth.uid.toString()) {
                         encontrado = true
-                        setearimgNombre("trabajadores", id.toString(), TextView, contexto, imagen)
+                        setearimgNombre(
+                            progressbar,
+                            "trabajadores",
+                            id.toString(),
+                            TextView,
+                            contexto,
+                            imagen
+                        )
                         break
                     }
                 }
@@ -312,6 +367,7 @@ object constantesTrabajadoresTiendasInicioFragmet {
                             val id = data?.get("id") as? String
                             if (id == constantes.firebaseAuth.uid.toString()) {
                                 setearimgNombre(
+                                    progressbar,
                                     "usuarios",
                                     id.toString(),
                                     TextView,
@@ -328,36 +384,45 @@ object constantesTrabajadoresTiendasInicioFragmet {
     }
 
     private fun setearimgNombre(
+        progressbar: CircularProgressIndicator,
         referencia: String,
         id: String,
         TextView: TextView,
         contexto: Context,
         imagen: CircleImageView
     ) {
-        val db2 = FirebaseFirestore.getInstance().collection("Trabajadores_Usuarios_Drivers")
+        FirebaseFirestore.getInstance().collection("Trabajadores_Usuarios_Drivers")
             .document(referencia).collection(referencia).document(id)
             .get().addOnSuccessListener { res ->
                 if (res.exists()) {
                     val data = res.data
-                    val nombre = data?.get("nombre") as? String
-                    val imagenPerfil = data?.get("imagenPerfil") as? String
+                    val nombre = data?.get("nombre") as? String ?: ""
+                    val imagenPerfil = data?.get("imagenPerfil") as? String ?: ""
                     TextView.text = nombre
+
+                    val placeholderperfil =
+                        ContextCompat.getDrawable(contexto, R.drawable.img_perfil)
+
                     if (imagenPerfil == "") {
-                        try {
-                            Glide.with(contexto)
-                                .load(R.drawable.img_perfil)
-                                .into(imagen)
-                        } catch (e: Exception) {
-                            println("error al setear la img")
-                        }
+                        constatnes_carga_imagenes_general.changer_img(
+                            progressbar,
+                            contexto,
+                            imagenPerfil,
+                            imagen,
+                            null,
+                            "perfil",
+                            placeholderperfil
+                        )
                     } else {
-                        try {
-                            Glide.with(contexto)
-                                .load(imagenPerfil)
-                                .into(imagen)
-                        } catch (e: Exception) {
-                            println("error al setear la img")
-                        }
+                        constatnes_carga_imagenes_general.changer_img(
+                            progressbar,
+                            contexto,
+                            imagenPerfil,
+                            imagen,
+                            null,
+                            "perfil",
+                            placeholderperfil // Usa el placeholder también en el else
+                        )
                     }
                 }
             }
@@ -403,6 +468,7 @@ object constantesTrabajadoresTiendasInicioFragmet {
                     } else if (filtrado == "General") {
                         listaTiendas.add(tiendas)
                     } else {
+
                     }
                 }
                 RecicleTiendas(listaTiendas, recicleTiendas1, contexto)

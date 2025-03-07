@@ -168,6 +168,7 @@ class inicioFracment : Fragment() {
 
         enviarCategoria()
         constantesTrabajadoresTiendasInicioFragmet.obtenerNombre_imgPerfil(
+            binding.includeCabezero.progressCargaImagen,
             binding.includeCabezero.usuarioRegsitradoName,
             mContex,
             binding.includeCabezero.imgPerfilUser

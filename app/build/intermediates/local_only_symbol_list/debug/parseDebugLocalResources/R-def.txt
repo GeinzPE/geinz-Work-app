@@ -422,7 +422,6 @@ id benefit7
 id benefit8
 id benefitsText
 id bodegasfilter
-id borra
 id borrarItem
 id botom_shet_publicacion
 id btnApply
@@ -1125,6 +1124,8 @@ id progresVar3Estrellas
 id progressBar
 id progressBarContainer
 id progress_5_stars
+id progress_carga_imagen
+id progress_carga_imagen_fondo
 id progressvar
 id progresvar1Estrellas
 id progrsBar

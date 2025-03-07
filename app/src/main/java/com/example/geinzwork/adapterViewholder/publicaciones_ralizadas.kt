@@ -3,10 +3,13 @@ package com.geinzz.geinzwork.adapterViewholder
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.geinzwork.constantesGeneral.Variables
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
+import com.geinzz.geinzwork.R
 import com.geinzz.geinzwork.databinding.ItemProductosTiendasBinding
 import com.geinzz.geinzwork.dataclass.dataclas_trabajos_ralizados
 import com.geinzz.geinzwork.publicaciones_trabajadores.editar_publicaciones
@@ -37,13 +40,16 @@ class publicaciones_ralizadas(private val listaTrabajos_realizados: MutableList<
             binding.tituloProducto.text = item.titulo
             binding.descripcionProducto.text = item.contenido
             binding.pen.isVisible = false
-            try {
-                Glide.with(itemView.context)
-                    .load(item.img)
-                    .into(binding.imgProducto)
-            } catch (e: Exception) {
-                println("error al setear la img")
-            }
+
+            val placeholderperfil = ContextCompat.getDrawable(itemView.context, R.drawable.cargando_img_geinz_500)
+            constatnes_carga_imagenes_general.changer_img(
+                binding.progressCargaImagen,
+                itemView.context,
+                item.img.toString(),
+               null,
+                binding.imgProducto,
+                "portada", placeholderperfil
+            )
 
             binding.Editar.setOnClickListener {
                 var intent = Intent(itemView.context, editar_publicaciones::class.java).apply {

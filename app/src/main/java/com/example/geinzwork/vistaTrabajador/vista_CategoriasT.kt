@@ -80,10 +80,6 @@ class vista_CategoriasT : AppCompatActivity() {
             }
 
         }
-        binding.borra.setOnClickListener {
-            binding.editexFilter.setText("")
-            binding.editexFilter.clearFocus()
-        }
 
         agregarCategoriasFiltrado()
         inicizializarFiltradoCat()

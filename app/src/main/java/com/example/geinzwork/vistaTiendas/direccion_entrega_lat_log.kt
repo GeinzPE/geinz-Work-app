@@ -62,7 +62,7 @@ class direccion_entrega_lat_log : AppCompatActivity() {
                     binding.obtenerLocalizacion.isVisible=true
                     Toast.makeText(
                         this,
-                        "latitud y longitud obtenida correctamente",
+                        "Ubicacion obtenida ",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
@@ -70,7 +70,7 @@ class direccion_entrega_lat_log : AppCompatActivity() {
                     binding.obtenerLocalizacion.isVisible=true
                     Toast.makeText(
                         this,
-                        "error al obtener la latitud y longitud",
+                        "error al obtener la ubicacion trate en un momento",
                         Toast.LENGTH_SHORT
                     ).show()
 

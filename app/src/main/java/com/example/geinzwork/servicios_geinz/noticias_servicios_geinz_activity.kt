@@ -970,7 +970,7 @@ class noticias_servicios_geinz_activity : AppCompatActivity() {
         }
 
         if (descunetosi && descuento!! >= precioInt) {
-            binding.descuentoED.error = "El descuento no puede ser o igual mayor al precio original"
+            binding.descuentoED.error = "El descuento no puede ser igual o mayor al precio original"
             return
         }
         val nuevoDescuento = if (descunetosi) descuentoTexto else ""

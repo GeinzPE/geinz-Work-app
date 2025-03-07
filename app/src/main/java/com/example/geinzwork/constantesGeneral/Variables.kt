@@ -214,7 +214,7 @@ object Variables {
     const val TK="TK"
     const val contactadoWhatsapp="contactadoWhatsapp"
     const val llamadas="llamadas"
-    const val imgane1="imgane1"
+    const val imgane1="imagen1"
     const val imagen2="imagen2"
     const val imagen3="imagen3"
     const val compartidas="compartidas"

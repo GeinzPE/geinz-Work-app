@@ -3,39 +3,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    style="@style/fondo"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    style="@style/fondo"
     tools:context=".publicaciones_trabajadores.editar_publicaciones">
 
     <TextView
-        android:textSize="20sp"
-        android:layout_gravity="center"
         style="@style/TextoModoOScuroColor"
-        android:fontFamily="@font/anton_regular"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginVertical="10dp"
-        android:text="Editar o eliminar publicaciones" />
+        android:fontFamily="@font/anton_regular"
+        android:text="Editar o eliminar publicaciones"
+        android:textSize="20sp" />
 
     <TextView
-        android:textSize="12sp"
         style="@style/descripcionColor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
+        android:text="Administra tus publicaciones: Aquí puedes editar o eliminar las publicaciones que has realizado anteriormente."
+        android:textSize="12sp" />
 
-        android:text="Administra tus publicaciones: Aquí puedes editar o eliminar las publicaciones que has realizado anteriormente."/>
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/imagen_trabajo"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="10dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/portada_agregar_geinz"
-        app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
+        android:layout_height="200dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/imagen_trabajo"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/portada_agregar_geinz"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress_carga_imagen"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:visibility="gone" />
+    </RelativeLayout>
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/titulo_publicaciontext"
@@ -84,8 +97,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/editar"

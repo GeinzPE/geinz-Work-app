@@ -18,9 +18,11 @@ import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.geinzwork.constantesGeneral.Variables
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
 import com.geinzz.geinzwork.EditarInfo
 import com.geinzz.geinzwork.Login
 import com.geinzz.geinzwork.R
@@ -281,14 +283,16 @@ class cuentaFracment : Fragment() {
                     binding.edadUser.text = "${edadUSer} años"
                     binding.tipoCuenta.text = TipoCuenta
 
-                    try {
-                        Glide.with(mContex)
-                            .load(imagenPerfil)
-                            .placeholder(R.drawable.img_perfil)
-                            .into(binding.imagenPerfil)
-                    } catch (e: Exception) {
-                        println(e)
-                    }
+                    val placeholderperfil = ContextCompat.getDrawable(mContex, R.drawable.img_perfil)
+                    constatnes_carga_imagenes_general.changer_img(
+                        binding.progressCargaImagen,
+                        mContex,
+                        imagenPerfil,
+                        binding.imagenPerfil,
+                        null,
+                        "perfil", placeholderperfil
+                    )
+
                 }
             }
     }
@@ -376,14 +380,16 @@ class cuentaFracment : Fragment() {
                     binding.edadUser.text = "${edadUSer} años"
                     binding.tipoCuenta.text = TipoCuenta
 
-                    try {
-                        Glide.with(mContex)
-                            .load(imagenPerfil)
-                            .placeholder(R.drawable.img_perfil)
-                            .into(binding.imagenPerfil)
-                    } catch (e: Exception) {
-                        println(e)
-                    }
+
+                    val placeholderperfil = ContextCompat.getDrawable(mContex, R.drawable.img_perfil)
+                    constatnes_carga_imagenes_general.changer_img(
+                        binding.progressCargaImagen,
+                        mContex,
+                        imagenPerfil,
+                        binding.imagenPerfil,
+                        null,
+                        "perfil", placeholderperfil
+                    )
                 }
             }
         val refStorage =

@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.geinzz.geinzwork.R;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -37,18 +38,23 @@ public final class ItemProductosTiendasBinding implements ViewBinding {
   public final TextView precioProducto;
 
   @NonNull
+  public final CircularProgressIndicator progressCargaImagen;
+
+  @NonNull
   public final TextView tituloProducto;
 
   private ItemProductosTiendasBinding(@NonNull ConstraintLayout rootView,
       @NonNull LinearLayout Editar, @NonNull TextView descripcionProducto,
       @NonNull ShapeableImageView imgProducto, @NonNull TextView pen,
-      @NonNull TextView precioProducto, @NonNull TextView tituloProducto) {
+      @NonNull TextView precioProducto, @NonNull CircularProgressIndicator progressCargaImagen,
+      @NonNull TextView tituloProducto) {
     this.rootView = rootView;
     this.Editar = Editar;
     this.descripcionProducto = descripcionProducto;
     this.imgProducto = imgProducto;
     this.pen = pen;
     this.precioProducto = precioProducto;
+    this.progressCargaImagen = progressCargaImagen;
     this.tituloProducto = tituloProducto;
   }
 
@@ -109,6 +115,12 @@ public final class ItemProductosTiendasBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.progress_carga_imagen;
+      CircularProgressIndicator progressCargaImagen = ViewBindings.findChildViewById(rootView, id);
+      if (progressCargaImagen == null) {
+        break missingId;
+      }
+
       id = R.id.tituloProducto;
       TextView tituloProducto = ViewBindings.findChildViewById(rootView, id);
       if (tituloProducto == null) {
@@ -116,7 +128,8 @@ public final class ItemProductosTiendasBinding implements ViewBinding {
       }
 
       return new ItemProductosTiendasBinding((ConstraintLayout) rootView, Editar,
-          descripcionProducto, imgProducto, pen, precioProducto, tituloProducto);
+          descripcionProducto, imgProducto, pen, precioProducto, progressCargaImagen,
+          tituloProducto);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

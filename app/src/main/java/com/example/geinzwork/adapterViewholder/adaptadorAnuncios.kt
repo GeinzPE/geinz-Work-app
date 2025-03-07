@@ -149,28 +149,20 @@ class adaptadorAnuncios(
                         val bitmap = (resource as BitmapDrawable).bitmap
                         val isVertical = bitmap.height > bitmap.width
 
+                        val layoutParamsAnim = like_animation.layoutParams as RelativeLayout.LayoutParams
+                        val imgHeight = imgAnuncio.height
 
-                        val layoutParamsImg = imgAnuncio.layoutParams as RelativeLayout.LayoutParams
-                        val layoutParamsAnim =
-                            like_animation.layoutParams as RelativeLayout.LayoutParams
+                        // Calcula el tamaño de like_animation en relación con la altura de imgAnuncio
+                        val likeSize = (imgHeight * 0.5).toInt()
 
-                        if (isVertical) {
-                            layoutParamsImg.width = ViewGroup.LayoutParams.MATCH_PARENT
-                            layoutParamsImg.height =
-                                500.dpToPx() 
-                            layoutParamsAnim.width = 200.dpToPx()
-                            layoutParamsAnim.height =
-                                200.dpToPx()  
-                        } else {
-                            layoutParamsImg.width =
-                                500.dpToPx() 
-                            layoutParamsImg.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                            layoutParamsAnim.width = 150.dpToPx()
-                            layoutParamsAnim.height =
-                                150.dpToPx() 
-                        }
+                        // Establece el tamaño máximo de like_animation
+                        val maxSize = 300.dpToPx() // Reemplaza con tu tamaño máximo deseado
 
-                        imgAnuncio.layoutParams = layoutParamsImg
+                        val finalLikeSize = if (likeSize > maxSize) maxSize else likeSize
+
+                        layoutParamsAnim.width = finalLikeSize
+                        layoutParamsAnim.height = finalLikeSize
+
                         like_animation.layoutParams = layoutParamsAnim
                         imgAnuncio.setImageDrawable(resource)
                     }
@@ -178,7 +170,6 @@ class adaptadorAnuncios(
                     override fun onLoadCleared(placeholder: Drawable?) {
                     }
                 })
-
             contenido.text = dataClassAnuncios.contenido
             constantesNoticias.obtenerLikesNoticias(
                 dataClassAnuncios,

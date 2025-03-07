@@ -31,6 +31,7 @@ import androidx.viewbinding.ViewBinding
 import com.bumptech.glide.Glide
 import com.example.geinzwork.constantesGeneral.Variables
 import com.example.geinzwork.constantesGeneral.constantes_trabajadores_info
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
 import com.geinzz.geinzwork.GenerarQR_trabajador
 import com.geinzz.geinzwork.R
 import com.geinzz.geinzwork.adapterViewholder.adapterTrabajo_realizados
@@ -47,6 +48,7 @@ import com.geinzz.geinzwork.dataclass.dataclas_trabajos_ralizados
 import com.geinzz.geinzwork.problemas_soporte_politicas.probleas_usuarios_formulario
 import com.geinzz.geinzwork.vistaTrabajador.vista_CategoriasT
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.dynamiclinks.androidParameters
@@ -177,8 +179,9 @@ class info : Fragment() {
         dialog.setContentView(bindings.root)
         bindings.whatsapp.setOnClickListener {
             val db = FirebaseFirestore.getInstance().collection(Variables.solicitud_servicios)
-                .document(Variables.verificacionesDB).collection(Variables.activos).document(idTrabajador)
-            constantesPublicidad.agregarCantidadClickAnuncios(db,"", Variables.contactadoWhatsapp)
+                .document(Variables.verificacionesDB).collection(Variables.activos)
+                .document(idTrabajador)
+            constantesPublicidad.agregarCantidadClickAnuncios(db, "", Variables.contactadoWhatsapp)
             val mensaje =
                 "Hola, estoy interesado en obtener más información sobre el trabajo que vi en Geinz. Gracias."
 
@@ -203,8 +206,9 @@ class info : Fragment() {
 
         bindings.llamado.setOnClickListener {
             val db = FirebaseFirestore.getInstance().collection(Variables.solicitud_servicios)
-                .document(Variables.verificacionesDB).collection(Variables.activos).document(idTrabajador)
-            constantesPublicidad.agregarCantidadClickAnuncios(db,"", Variables.llamadas)
+                .document(Variables.verificacionesDB).collection(Variables.activos)
+                .document(idTrabajador)
+            constantesPublicidad.agregarCantidadClickAnuncios(db, "", Variables.llamadas)
             showPermissionDialog(mContex, numero)
             dialog.dismiss()
         }
@@ -215,40 +219,44 @@ class info : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SuspiciousIndentation")
     private fun obtenerPerfil(id: String, img: String) {
+        val placeholderPortada =
+            ContextCompat.getDrawable(mContex, R.drawable.sin_foto_portada_con_marca)
+        val placeholder = ContextCompat.getDrawable(mContex, R.drawable.img_perfil)
+
         val refStorage =
             FirebaseStorage.getInstance().getReference(Variables.usuarios_db)
                 .child(id).child(Variables.foto_portada)
         refStorage.downloadUrl.addOnSuccessListener { uri ->
+
             val imgUrl = uri.toString()
-            try {
-                Glide.with(this)
-                    .load(imgUrl)
-                    .placeholder(R.drawable.cargando_img)
-                    .error(R.drawable.no_cuenta_img)
-                    .into(binding.imgPortada)
-
-            } catch (e: Exception) {
-                println(e)
-            }
-
+            constatnes_carga_imagenes_general.changer_img(
+                binding.progressCargaImagenFondo,
+                mContex,
+                imgUrl,
+                null,
+                binding.imgPortada,
+                "portada", placeholderPortada
+            )
         }
-
 
         constantes.obtenerEstado(binding.estado, id)
-        try {
-            Glide.with(this)
-                .load(img)
-                .placeholder(R.drawable.img_perfil)
-                .into(binding.imgPerfilUser)
 
-        } catch (e: Exception) {
-            println(e)
-        }
+        constatnes_carga_imagenes_general.changer_img(
+            binding.progressCargaImagen,
+            mContex,
+            img,
+            binding.imgPerfilUser,
+            null,
+            "perfil", placeholder
+        )
+
+
     }
 
     private fun obtenerImagenesFirestorage(idT: String) {
         val id = idT
-        val referenciaStorage = FirebaseStorage.getInstance().getReference(Variables.usuarios_db).child(id)
+        val referenciaStorage =
+            FirebaseStorage.getInstance().getReference(Variables.usuarios_db).child(id)
 
         val lista = mutableListOf<CarouselItem>()
 
@@ -358,8 +366,9 @@ class info : Fragment() {
                 }
             } else if (itemID == 2) {
                 val db = FirebaseFirestore.getInstance().collection(Variables.solicitud_servicios)
-                    .document(Variables.verificacionesDB).collection(Variables.activos).document(idTrabajador)
-                constantesPublicidad.agregarCantidadClickAnuncios(db,"", Variables.compartidas)
+                    .document(Variables.verificacionesDB).collection(Variables.activos)
+                    .document(idTrabajador)
+                constantesPublicidad.agregarCantidadClickAnuncios(db, "", Variables.compartidas)
                 createAndShareDynamicLink(idTrabajador)
             } else if (itemID == 3) {
                 if (firebaseAuth.uid.toString() == idTrabajador) {
@@ -376,7 +385,7 @@ class info : Fragment() {
                 } else {
                     val vista = Intent(mContex, probleas_usuarios_formulario::class.java).apply {
                         putExtra(Variables.idTrabajador, idTrabajador)
-                        putExtra(Variables.nombreUSer,nombre)
+                        putExtra(Variables.nombreUSer, nombre)
                         putExtra(Variables.categoria, categoria)
                         putExtra(Variables.nacionalidad, nacionalidad)
                     }
@@ -391,13 +400,14 @@ class info : Fragment() {
     private fun obtenerRedes(context: Context, red: String, idTrabajador: String) {
         val userCollections =
             FirebaseFirestore.getInstance().collection(Variables.trabajadores_usuariosDB)
-                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB).document(idTrabajador)
+                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB)
+                .document(idTrabajador)
         userCollections.get().addOnSuccessListener { res ->
             if (res.exists()) {
                 val data = res.data
-                val ig = data?.get(Variables.IG) as? String?:""
-                val fb = data?.get(Variables.FB) as? String?:""
-                val tk = data?.get(Variables.TK) as? String?:""
+                val ig = data?.get(Variables.IG) as? String ?: ""
+                val fb = data?.get(Variables.FB) as? String ?: ""
+                val tk = data?.get(Variables.TK) as? String ?: ""
 
                 when (red) {
                     Variables.ig -> {
@@ -424,25 +434,26 @@ class info : Fragment() {
     ) {
         val userCollections =
             FirebaseFirestore.getInstance().collection(Variables.trabajadores_usuariosDB)
-                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB).document(idUSer)
+                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB)
+                .document(idUSer)
         userCollections.get().addOnSuccessListener { res ->
             if (res.exists()) {
                 val data = res.data
-                val nombre = data?.get(Variables.nombre) as? String?:""
-                val descripcion = data?.get(Variables.descripcion) as? String?:""
-                val categoriaTrabajo = data?.get(Variables.categoriaTrabajo) as? String?:""
-                val genero = data?.get(Variables.genero) as? String?:""
-                val horario1 = data?.get(Variables.horario1) as? String?:""
-                val horario2 = data?.get(Variables.horario2) as? String?:""
-                val nacionalidad = data?.get(Variables.nacionalidad) as? String?:""
-                val localidad = data?.get(Variables.localidad) as? String?:""
-                val codigo_pais = data?.get(Variables.codigo_pais) as? String?:""
-                val numero = data?.get(Variables.numero) as? String?:""
-                val tipoTrabajo = data?.get(Variables.tipoTrabajo) as? String?:""
-                val EdadActual = data?.get(Variables.EdadActual) as? String?:""
-                val ig = data?.get(Variables.IG) as? String?:""
-                val fb = data?.get(Variables.FB) as? String?:""
-                val tk = data?.get(Variables.TK) as? String?:""
+                val nombre = data?.get(Variables.nombre) as? String ?: ""
+                val descripcion = data?.get(Variables.descripcion) as? String ?: ""
+                val categoriaTrabajo = data?.get(Variables.categoriaTrabajo) as? String ?: ""
+                val genero = data?.get(Variables.genero) as? String ?: ""
+                val horario1 = data?.get(Variables.horario1) as? String ?: ""
+                val horario2 = data?.get(Variables.horario2) as? String ?: ""
+                val nacionalidad = data?.get(Variables.nacionalidad) as? String ?: ""
+                val localidad = data?.get(Variables.localidad) as? String ?: ""
+                val codigo_pais = data?.get(Variables.codigo_pais) as? String ?: ""
+                val numero = data?.get(Variables.numero) as? String ?: ""
+                val tipoTrabajo = data?.get(Variables.tipoTrabajo) as? String ?: ""
+                val EdadActual = data?.get(Variables.EdadActual) as? String ?: ""
+                val ig = data?.get(Variables.IG) as? String ?: ""
+                val fb = data?.get(Variables.FB) as? String ?: ""
+                val tk = data?.get(Variables.TK) as? String ?: ""
 
                 verificarEstado_verificacion(fb, ig, tk, idUSer)
                 binding.nombre.text = nombre.toUpperCase()
@@ -618,7 +629,8 @@ class info : Fragment() {
     ) {
         val userCollections =
             FirebaseFirestore.getInstance().collection(Variables.trabajadores_usuariosDB)
-                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB).document(idTrabajador)
+                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB)
+                .document(idTrabajador)
 
         userCollections.get().addOnSuccessListener { res ->
             if (res.exists()) {

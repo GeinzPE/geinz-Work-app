@@ -16,15 +16,30 @@
            style="@style/RoundTrabajadoresBG"
             android:layout_margin="10dp">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imgProducto"
+
+            <RelativeLayout
                 android:layout_width="100dp"
-                android:layout_height="100dp"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent"
                 android:layout_gravity="center"
-                android:src="@drawable/cargando_img_geinz_500"
-                android:scaleType="centerCrop"
-                android:layout_marginLeft="5dp"/>
+                android:layout_height="100dp">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imgProducto"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent"
+                    android:src="@drawable/cargando_img_geinz_500"
+                    android:scaleType="centerCrop"
+                    android:layout_marginLeft="5dp"/>
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/progress_carga_imagen"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="gone" />
+            </RelativeLayout>
+
+
 
             <LinearLayout
                 android:id="@+id/Editar"

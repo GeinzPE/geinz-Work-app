@@ -72,7 +72,7 @@ object constantesImagenes {
                         val urlimg = res.toString()
                         Toast.makeText(
                             contexto,
-                            "obtenemos el $nombreimg",
+                            "cargando $nombreimg",
                             Toast.LENGTH_SHORT
                         ).show()
                         var urlObtenida = reortnarur(urlimg)

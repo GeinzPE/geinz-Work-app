@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.geinzz.geinzwork.R;
 import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.android.material.textfield.TextInputLayout;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -41,6 +42,9 @@ public final class ActivityEditarPublicacionesBinding implements ViewBinding {
   public final LinearLayout main;
 
   @NonNull
+  public final CircularProgressIndicator progressCargaImagen;
+
+  @NonNull
   public final EditText tituloPublicacionED;
 
   @NonNull
@@ -50,7 +54,8 @@ public final class ActivityEditarPublicacionesBinding implements ViewBinding {
       @NonNull TextInputLayout descripcionServicios, @NonNull EditText descripcionServiciosED,
       @NonNull AppCompatButton editar, @NonNull AppCompatButton eliminar,
       @NonNull ShapeableImageView imagenTrabajo, @NonNull LinearLayout main,
-      @NonNull EditText tituloPublicacionED, @NonNull TextInputLayout tituloPublicaciontext) {
+      @NonNull CircularProgressIndicator progressCargaImagen, @NonNull EditText tituloPublicacionED,
+      @NonNull TextInputLayout tituloPublicaciontext) {
     this.rootView = rootView;
     this.descripcionServicios = descripcionServicios;
     this.descripcionServiciosED = descripcionServiciosED;
@@ -58,6 +63,7 @@ public final class ActivityEditarPublicacionesBinding implements ViewBinding {
     this.eliminar = eliminar;
     this.imagenTrabajo = imagenTrabajo;
     this.main = main;
+    this.progressCargaImagen = progressCargaImagen;
     this.tituloPublicacionED = tituloPublicacionED;
     this.tituloPublicaciontext = tituloPublicaciontext;
   }
@@ -121,6 +127,12 @@ public final class ActivityEditarPublicacionesBinding implements ViewBinding {
 
       LinearLayout main = (LinearLayout) rootView;
 
+      id = R.id.progress_carga_imagen;
+      CircularProgressIndicator progressCargaImagen = ViewBindings.findChildViewById(rootView, id);
+      if (progressCargaImagen == null) {
+        break missingId;
+      }
+
       id = R.id.titulo_publicacionED;
       EditText tituloPublicacionED = ViewBindings.findChildViewById(rootView, id);
       if (tituloPublicacionED == null) {
@@ -134,8 +146,8 @@ public final class ActivityEditarPublicacionesBinding implements ViewBinding {
       }
 
       return new ActivityEditarPublicacionesBinding((LinearLayout) rootView, descripcionServicios,
-          descripcionServiciosED, editar, eliminar, imagenTrabajo, main, tituloPublicacionED,
-          tituloPublicaciontext);
+          descripcionServiciosED, editar, eliminar, imagenTrabajo, main, progressCargaImagen,
+          tituloPublicacionED, tituloPublicaciontext);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
