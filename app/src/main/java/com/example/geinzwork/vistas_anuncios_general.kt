@@ -109,6 +109,7 @@ class vistas_anuncios_general : AppCompatActivity() {
             binding.imgAnuncio.isVisible = true
             binding.containerBasicoGeinz.isVisible = true
             binding.compartir.isVisible = true
+            retornarubiTienda(documento,anuncio,binding.ubicacion)
         }
 
         binding.popup.setOnClickListener {
@@ -117,12 +118,44 @@ class vistas_anuncios_general : AppCompatActivity() {
         binding.btnPLanes.setOnClickListener {
             startActivity(Intent(this, Crea_tu_publicidad::class.java))
         }
+
+        binding.ubicacion.setOnClickListener {
+
+        }
         binding.compartir.setOnClickListener {
             createAndShareDynamicLink(this)
         }
         val db = FirebaseFirestore.getInstance().collection(Variables.anuncios).document(documento)
             .collection(Variables.anuncios).document(anuncio)
         constantesPublicidad.obtenerLocalidaGeneroTipoCuenta(db, Variables.tipoPublicidad)
+
+
+    }
+
+    private fun retornarubiTienda(docuemnto: String, anuncio: String,ubiBTN:ImageView) {
+        val db = FirebaseFirestore.getInstance().collection(Variables.anuncios).document(docuemnto)
+            .collection(Variables.anuncios).document(anuncio)
+        db.get().addOnSuccessListener { res ->
+            if (res.exists()) {
+                val data = res.data
+                val ubicaciontxt = data?.get("ubicacion_tienda") as? String ?: ""
+                val ubicacionBoolena = data?.get("ubicacion") as? Boolean ?: false
+
+                if(ubicacionBoolena){
+                    ubiBTN.isVisible=true
+                    ubiBTN.setOnClickListener {
+                        constantes.abrirGoogleMaps(this, ubicaciontxt)
+                    }
+
+                }else{
+                    ubiBTN.isVisible=false
+                }
+            } else {
+                println("error al obtener la ubicacion")
+            }
+        }.addOnFailureListener { e->
+            println("error al obtener la ubicacion $e")
+        }
 
     }
 
@@ -144,7 +177,8 @@ class vistas_anuncios_general : AppCompatActivity() {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
-                val db = FirebaseFirestore.getInstance().collection(Variables.anuncios).document(documento)
+                val db = FirebaseFirestore.getInstance().collection(Variables.anuncios)
+                    .document(documento)
                     .collection(Variables.anuncios).document(anuncio)
 
                 constantesPublicidad.agregarCantidadClickAnuncios(db, anuncio, Variables.vistas)
@@ -449,10 +483,10 @@ class vistas_anuncios_general : AppCompatActivity() {
         ocultarContenedorSiEstaVacio(tk, bindingRedes.containerTK)
         ocultarContenedorSiEstaVacio(web, bindingRedes.containerWEB)
 
-        configurarListenerRedSocial(   dialog,this,bindingRedes.ig, ig, "com.instagram.android")
-        configurarListenerRedSocial(   dialog,this,bindingRedes.fb, fb, "com.facebook.katana")
-        configurarListenerRedSocial(   dialog,this,bindingRedes.tk, tk, "com.zhiliaoapp.musically")
-        configurarListenerRedSocial(   dialog,this,bindingRedes.web, web, "", esWeb = true)
+        configurarListenerRedSocial(dialog, this, bindingRedes.ig, ig, "com.instagram.android")
+        configurarListenerRedSocial(dialog, this, bindingRedes.fb, fb, "com.facebook.katana")
+        configurarListenerRedSocial(dialog, this, bindingRedes.tk, tk, "com.zhiliaoapp.musically")
+        configurarListenerRedSocial(dialog, this, bindingRedes.web, web, "", esWeb = true)
 
         bindingRedes.modalidaNegocio.text = if (modalidadTienda == true) "Fisica" else "Virtual"
         bindingRedes.fechaPublicada.text = publicadada
@@ -475,6 +509,7 @@ class vistas_anuncios_general : AppCompatActivity() {
         dialog.setContentView(view)
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun obtenerDatosPublicidad(docuemnto: String, anuncio: String) {
@@ -613,8 +648,9 @@ class vistas_anuncios_general : AppCompatActivity() {
                     binding.includeLinealPrecios.descuentoPorcentaje.isVisible = true
                     binding.includeLinealPrecios.textViewPriceBefore.text = "S/ $precio.00"
                     binding.includeLinealPrecios.precio.text = "S/ $descuento.00"
-                    binding.includeLinealPrecios.descuentoPorcentaje.text = "- ${porcentajeDescuento}%"
-                }else{
+                    binding.includeLinealPrecios.descuentoPorcentaje.text =
+                        "- ${porcentajeDescuento}%"
+                } else {
                     binding.includeLinealPrecios.precio.text = "S/ $precio.00"
                     binding.includeLinealPrecios.textViewPriceBefore.isVisible = false
                     binding.includeLinealPrecios.descuentoPorcentaje.isVisible = false
@@ -672,8 +708,9 @@ class vistas_anuncios_general : AppCompatActivity() {
     }
 
     private fun obtenerDatos_Avanzado_Premiun(docuemnto1: String, documento2: String) {
-        val refefencia = FirebaseStorage.getInstance().getReference(Variables.anuncios).child(docuemnto1)
-            .child(documento2).child(Variables.Imagenes_publicitarias)
+        val refefencia =
+            FirebaseStorage.getInstance().getReference(Variables.anuncios).child(docuemnto1)
+                .child(documento2).child(Variables.Imagenes_publicitarias)
         refefencia.listAll().addOnSuccessListener { listResul ->
             listResul.items.forEach { item ->
                 item.downloadUrl.addOnSuccessListener { uri ->
@@ -808,9 +845,17 @@ class vistas_anuncios_general : AppCompatActivity() {
                             true -> {
                                 Intent(this@vistas_anuncios_general, Crea_tu_publicidad::class.java)
                             }
+
                             false -> {
-                                agregarCantidadClickAnuncios(db.document(listaIds[position]), anuncio, "click")
-                                Intent(this@vistas_anuncios_general, vistas_anuncios_general::class.java).apply {
+                                agregarCantidadClickAnuncios(
+                                    db.document(listaIds[position]),
+                                    anuncio,
+                                    "click"
+                                )
+                                Intent(
+                                    this@vistas_anuncios_general,
+                                    vistas_anuncios_general::class.java
+                                ).apply {
                                     putExtra(Variables.documentoAdapterPromo, documento)
                                     putExtra(Variables.anuncio, listaIds[position])
                                 }
@@ -831,7 +876,6 @@ class vistas_anuncios_general : AppCompatActivity() {
             println("Error al obtener los datos: $e")
         }
     }
-
 
 
 }

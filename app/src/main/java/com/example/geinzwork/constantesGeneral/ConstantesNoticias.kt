@@ -90,7 +90,8 @@ object constantesNoticias {
                         id = id,
                         numero = datos.getString("numero") ?: "",
                         mensaje = datos.getString("whatsappmsj") ?: "",
-                        fechaVencimiento = (datos.get("fechas") as? Map<String, Any>)?.get("fecha_vencimiento") as? String ?: "",
+                        fechaVencimiento = (datos.get("fechas") as? Map<String, Any>)?.get("fecha_vencimiento") as? String
+                            ?: "",
                         estadoVencimiento = datos.getString("estado") ?: "",
                         categoria = datos.getString("Categoria") ?: "",
                         TipoPromo = datos.getString("tipoPromo") ?: "",
@@ -139,7 +140,6 @@ object constantesNoticias {
             recielAnuncios.isVisible = false
         }
     }
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -293,7 +293,14 @@ object constantesNoticias {
                 }
 
 
-                inicializarReciles(Variables.tipoNoticia, lista, recielAnuncios, context, zoomout, zoomouts)
+                inicializarReciles(
+                    Variables.tipoNoticia,
+                    lista,
+                    recielAnuncios,
+                    context,
+                    zoomout,
+                    zoomouts
+                )
                 actualizarVisibilidad(
                     hayArticulos = lista.isNotEmpty(),
                     loading = loading,
@@ -410,7 +417,8 @@ object constantesNoticias {
     fun obtenerCategorias(autoCompleteCategory: AutoCompleteTextView) {
         val categoriasTiendas = mutableListOf<String>()
         val db =
-            FirebaseFirestore.getInstance().collection(Variables.categoriasDB).document(Variables.categoriasTiendaDB)
+            FirebaseFirestore.getInstance().collection(Variables.categoriasDB)
+                .document(Variables.categoriasTiendaDB)
 
         db.get()
             .addOnSuccessListener { res ->
@@ -545,10 +553,10 @@ object constantesNoticias {
         dataClassAnuncios: dataClassAnuncios,
         contadorLike: TextView,
         lineaMegusta: LinearLayout,
-        carga:ProgressBar,
-        contadorActividades:LinearLayout
+        carga: ProgressBar,
+        contadorActividades: LinearLayout
     ) {
-        carga.isVisible=true
+        carga.isVisible = true
         val postId = dataClassAnuncios.id.toString()
         val databaseReference =
             FirebaseDatabase.getInstance().getReference(Variables.cantidadLikes).child(postId)
@@ -556,15 +564,15 @@ object constantesNoticias {
         databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val totalLikes = snapshot.childrenCount.toInt()
-                carga.isVisible=false
-                contadorActividades.isVisible=true
+                carga.isVisible = false
+                contadorActividades.isVisible = true
                 lineaMegusta.isVisible = true
                 contadorLike.text = "${totalLikes}"
             }
 
             override fun onCancelled(error: DatabaseError) {
                 lineaMegusta.isVisible = false
-                contadorActividades.isVisible=false
+                contadorActividades.isVisible = false
                 println("Error al obtener la cantidad de likes: ${error.message}")
             }
         })
@@ -816,7 +824,8 @@ object constantesNoticias {
         idUser: String,
         idPublicaion: String,
     ) {
-        val db = FirebaseFirestore.getInstance().collection(Variables.noticiasDB).document(idPublicaion)
+        val db =
+            FirebaseFirestore.getInstance().collection(Variables.noticiasDB).document(idPublicaion)
         val db2 = FirebaseFirestore.getInstance()
             .collection(Variables.trabajadores_usuariosDB)
             .document(Variables.trabajadoresDB)
