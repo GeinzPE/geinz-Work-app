@@ -676,7 +676,6 @@ id finaliza
 id fotoPortada
 id foto_portada
 id fracmentoID
-id fracmentoLayaout
 id frameInfo
 id frameSinReview
 id freelancer

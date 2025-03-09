@@ -22,6 +22,8 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.geinzwork.constantesGeneral.constantes_agregar_estadisticas_publicaiones
 import com.example.geinzwork.oferta_principales_geinz
 import com.geinzz.geinzwork.constantesGeneral.constantesPublicidad
@@ -39,6 +41,7 @@ import com.geinzz.geinzwork.vistaTiendas.VistaTienda
 import com.geinzz.geinzwork.vistaTiendas.vistaProductosGeneralTiendas
 import com.geinzz.geinzwork.vistaTrabajador.ver_detalles_Promociones
 import com.geinzz.geinzwork.vistaTrabajador.vistaTrabajador
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDragHandleView
 import com.google.firebase.auth.FirebaseAuth
@@ -57,6 +60,10 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
     private lateinit var bindingbottomShet: BottomShettCambiosRealizadosBinding
 
     private lateinit var remoteConfig: FirebaseRemoteConfig
+
+    private lateinit var viewPager: ViewPager2
+    private lateinit var bottomNav: BottomNavigationView
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,13 +100,11 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
                     val idTiendaSeleccionada = deepLink.getQueryParameter("idTiendaSeleccionada")
                     val idTrabajadorGeinz = deepLink.getQueryParameter("idTrabajadorGeinz")
 
-
                     when {
                         idPublicidadPrimaria != null && idAnuncio != null -> openPublicidadPrimaria(
                             idPublicidadPrimaria,
                             idAnuncio
                         )
-
                         idTrabajadorGeinz != null -> openVistaTrabajador(idTrabajadorGeinz)
                         anunciosPrimarios != null -> openAnunciosPrimarios(anunciosPrimarios)
                         storeId != null -> openPublicidad(storeId)
@@ -107,7 +112,6 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
                         ArticiculoClikado != null && idTiendaSeleccionada != null -> openArticuloTienda(
                             ArticiculoClikado, idTiendaSeleccionada
                         )
-
                         else -> println("No se encontraron parámetros válidos en el enlace")
                     }
                 }
@@ -120,7 +124,7 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
             Toast.makeText(this, "No hay conexión a Internet", Toast.LENGTH_SHORT).show()
             sinInternetfun()
         } else {
-            loadMainContent()
+            //loadMainContent()
         }
         val configSettings = FirebaseRemoteConfigSettings.Builder()
             .setMinimumFetchIntervalInSeconds(3600) // Fetch cada hora
@@ -138,7 +142,6 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
                     println("error al obtener la version")
                 }
             }
-
         intent?.let {
             if (it.hasExtra("target")) {
                 val target = it.getStringExtra("target")
@@ -147,8 +150,55 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
                 }
             }
         }
+
+        viewPager = binding.viewPager
+        bottomNav = binding.buttonNavigation
+
+        viewPagerAdapter = ViewPagerAdapter(this)
+        viewPager.adapter = viewPagerAdapter
+
+        bottomNav.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.inicio -> viewPager.currentItem = 0
+                R.id.Contacto -> viewPager.currentItem = 1
+                R.id.Categorias -> viewPager.currentItem = 2
+                R.id.Cuenta -> viewPager.currentItem = 3
+            }
+            true
+        }
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                val menuItemId = when (position) {
+                    0 -> R.id.inicio
+                    1 -> R.id.Contacto
+                    2 -> R.id.Categorias // Ajustado para corresponder a la posición 2
+                    3 -> R.id.Cuenta // Ajustado para corresponder a la posición 3
+                    else -> R.id.inicio // Valor predeterminado
+                }
+                bottomNav.selectedItemId = menuItemId
+            }
+        })
     }
 
+    private inner class ViewPagerAdapter(activity: AppCompatActivity) : FragmentStateAdapter(activity) {
+
+        override fun getItemCount(): Int {
+            // Devuelve el número total de fragmentos
+            return 4 // Cambia esto según la cantidad de tus fragmentos
+        }
+
+        override fun createFragment(position: Int): Fragment {
+            // Crea y devuelve el fragmento para la posición dada
+            return when (position) {
+                0 -> inicioFracment() // Reemplaza con tus fragmentos
+                1 -> contactoFracment()
+                2 -> categoriasFracment()
+                3 -> if (firebaseAuth.currentUser == null) sinRegistroFracment() else cuentaFracment()
+                else -> inicioFracment() // Valor predeterminado
+            }
+        }
+    }
     private fun openVistaTrabajador(idTrabajadorGeinz: String) {
         val userCollections =
             FirebaseFirestore.getInstance().collection("Trabajadores_Usuarios_Drivers")
@@ -328,62 +378,61 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
         fragment?.let {
             supportFragmentManager.beginTransaction().remove(it).commit()
         }
-        loadMainContent()
+//        loadMainContent()
     }
 
-    private fun loadMainContent() {
-        verinicio()
+//    private fun loadMainContent() {
+//        verinicio()
+//
+//        binding.buttonNavigation.setOnItemSelectedListener { item ->
+//            if (isUpdatingBottomNavigation) return@setOnItemSelectedListener true // Evita cambios mientras se actualiza
+//            when (item.itemId) {
+//                R.id.inicio -> {
+//                    if (currentFragmentTag != "FragmentInicio") {
+//                        verinicio()
+//                    }
+//                    true
+//                }
+//
+//                R.id.Contacto -> {
+//                    if (currentFragmentTag != "FragmentContacto") {
+//                        vercontacto()
+//                    }
+//                    true
+//                }
+//
+//                R.id.Categorias -> {
+//                    if (currentFragmentTag != "FragmentCategorias") {
+//                        vercategoria()
+//                    }
+//                    true
+//                }
+//
+//                R.id.Cuenta -> {
+//                    if (currentFragmentTag != "FragmentCuenta") {
+//                        vercuenta()
+//                    }
+//                    true
+//                }
+//
+//
+//                else -> false
+//            }
+//        }
+//    }
 
-        binding.buttonNavigation.setOnItemSelectedListener { item ->
-            if (isUpdatingBottomNavigation) return@setOnItemSelectedListener true // Evita cambios mientras se actualiza
-            when (item.itemId) {
-                R.id.inicio -> {
-                    if (currentFragmentTag != "FragmentInicio") {
-                        verinicio()
-                    }
-                    true
-                }
-
-                R.id.Contacto -> {
-                    if (currentFragmentTag != "FragmentContacto") {
-                        vercontacto()
-                    }
-                    true
-                }
-
-                R.id.Categorias -> {
-                    if (currentFragmentTag != "FragmentCategorias") {
-                        vercategoria()
-                    }
-                    true
-                }
-
-                R.id.Cuenta -> {
-                    if (currentFragmentTag != "FragmentCuenta") {
-                        vercuenta()
-                    }
-                    true
-                }
-
-
-
-                else -> false
-            }
-        }
-    }
-
-    private fun replaceFragment(fragment: Fragment, tag: String) {
-        currentFragmentTag = tag
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fracmentoLayaout, fragment, tag)
-            .commit()
-    }
+//    private fun replaceFragment(fragment: Fragment, tag: String) {
+//        currentFragmentTag = tag
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.fracmentoLayaout, fragment, tag)
+//            .commit()
+//    }
 
     override fun onBackPressed() {
-        if (currentFragmentTag == "FracmentInicio") {
-            super.onBackPressed()
+        if (viewPager.currentItem == 0) { // Verifica si el fragmento actual es el primero (inicio)
+            super.onBackPressed() // Si es el inicio, realiza la acción predeterminada (salir de la actividad)
         } else {
-            verinicio()
+            viewPager.currentItem = 0 // Si no es el inicio, cambia al fragmento de inicio
         }
     }
 
@@ -422,64 +471,64 @@ class MainActivity : AppCompatActivity(), View.OnApplyWindowInsetsListener {
     private fun sinInternetfun() {
         val fragmentBinding = sinInternet()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.replace(binding.fracmentoLayaout.id, fragmentBinding, "sin_internet")
+        fragmentTransaction.replace(binding.viewPager.id, fragmentBinding, "sin_internet")
         fragmentTransaction.commit()
     }
-
-    private fun verinicio() {
-        var fracmentBinding = inicioFracment()
-        fracmentBinding.arguments = bundle
-        val fracmentTrasition = supportFragmentManager.beginTransaction()
-        fracmentTrasition.replace(binding.fracmentoLayaout.id, fracmentBinding, "FracmentInicio")
-        replaceFragment(inicioFracment(), "FracmentInicio")
-        fracmentTrasition.commit()
-        updateBottomNavigation(R.id.inicio)
-
-    }
-
-    private fun vercontacto() {
-        var fracmentBinding = contactoFracment()
-        val fracmentTrasition = supportFragmentManager.beginTransaction()
-        fracmentTrasition.replace(binding.fracmentoLayaout.id, fracmentBinding, "contactoFracment")
-        replaceFragment(contactoFracment(), "FragmentContacto")
-        fracmentTrasition.commit()
-        updateBottomNavigation(R.id.Contacto)
-    }
-
-    private fun vercategoria() {
-        var fracmentBinding = categoriasFracment()
-        val fracmentTrasition = supportFragmentManager.beginTransaction()
-        fracmentTrasition.replace(
-            binding.fracmentoLayaout.id,
-            fracmentBinding,
-            "categoriasFracment"
-        )
-        replaceFragment(categoriasFracment(), "FragmentCategorias")
-        fracmentTrasition.commit()
-        updateBottomNavigation(R.id.Categorias)
-
-    }
-
-    private fun vercuenta() {
-        if (firebaseAuth.currentUser == null) {
-            var fracmentBinding = sinRegistroFracment()
-            val transition = supportFragmentManager.beginTransaction()
-            transition.replace(binding.fracmentoLayaout.id, fracmentBinding, "sin registro")
-            replaceFragment(sinRegistroFracment(), "FragmentCuenta")
-            transition.commit()
-        } else {
-            var fracmentBinding = cuentaFracment()
-            val fracmentTrasition = supportFragmentManager.beginTransaction()
-            fracmentTrasition.replace(
-                binding.fracmentoLayaout.id,
-                fracmentBinding,
-                "cuentaFracment"
-            )
-            replaceFragment(cuentaFracment(), "cuentaFracment")
-            fracmentTrasition.commit()
-        }
-        updateBottomNavigation(R.id.Cuenta)
-    }
+//
+//    private fun verinicio() {
+//        var fracmentBinding = inicioFracment()
+//        fracmentBinding.arguments = bundle
+//        val fracmentTrasition = supportFragmentManager.beginTransaction()
+//        fracmentTrasition.replace(binding.fracmentoLayaout.id, fracmentBinding, "FracmentInicio")
+//        replaceFragment(inicioFracment(), "FracmentInicio")
+//        fracmentTrasition.commit()
+//        updateBottomNavigation(R.id.inicio)
+//
+//    }
+//
+//    private fun vercontacto() {
+//        var fracmentBinding = contactoFracment()
+//        val fracmentTrasition = supportFragmentManager.beginTransaction()
+//        fracmentTrasition.replace(binding.fracmentoLayaout.id, fracmentBinding, "contactoFracment")
+//        replaceFragment(contactoFracment(), "FragmentContacto")
+//        fracmentTrasition.commit()
+//        updateBottomNavigation(R.id.Contacto)
+//    }
+//
+//    private fun vercategoria() {
+//        var fracmentBinding = categoriasFracment()
+//        val fracmentTrasition = supportFragmentManager.beginTransaction()
+//        fracmentTrasition.replace(
+//            binding.fracmentoLayaout.id,
+//            fracmentBinding,
+//            "categoriasFracment"
+//        )
+//        replaceFragment(categoriasFracment(), "FragmentCategorias")
+//        fracmentTrasition.commit()
+//        updateBottomNavigation(R.id.Categorias)
+//
+//    }
+//
+//    private fun vercuenta() {
+//        if (firebaseAuth.currentUser == null) {
+//            var fracmentBinding = sinRegistroFracment()
+//            val transition = supportFragmentManager.beginTransaction()
+//            transition.replace(binding.fracmentoLayaout.id, fracmentBinding, "sin registro")
+//            replaceFragment(sinRegistroFracment(), "FragmentCuenta")
+//            transition.commit()
+//        } else {
+//            var fracmentBinding = cuentaFracment()
+//            val fracmentTrasition = supportFragmentManager.beginTransaction()
+//            fracmentTrasition.replace(
+//                binding.fracmentoLayaout.id,
+//                fracmentBinding,
+//                "cuentaFracment"
+//            )
+//            replaceFragment(cuentaFracment(), "cuentaFracment")
+//            fracmentTrasition.commit()
+//        }
+//        updateBottomNavigation(R.id.Cuenta)
+//    }
 
     override fun onApplyWindowInsets(v: View, insets: WindowInsets): WindowInsets {
         TODO("Not yet implemented")
