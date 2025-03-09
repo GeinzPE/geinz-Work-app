@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:animateLayoutChanges="true"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="@color/colorFondo"
     android:orientation="vertical">
 
     <com.google.android.material.bottomsheet.BottomSheetDragHandleView
@@ -20,7 +21,7 @@
         android:layout_gravity="center"
         android:layout_marginVertical="10dp"
         android:fontFamily="@font/anton_regular"
-        android:text="Editar o eliminar publicaciones"
+        android:text="Edita tu publicaciones"
         android:textSize="20sp" />
 
     <TextView
@@ -37,12 +38,12 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imagen_trabajo"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_margin="10dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/portada_agregar_geinz" />
+            android:src="@drawable/portada_agregar_geinz"
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.MaterialComponents.MediumComponent" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/progress_carga_imagen"
@@ -56,13 +57,13 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/titulo_publicaciontext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
         app:boxCornerRadiusBottomEnd="8dp"
         app:boxCornerRadiusBottomStart="8dp"
         app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="10dp">
+        app:boxCornerRadiusTopStart="8dp">
 
         <EditText
             android:id="@+id/titulo_publicacionED"
@@ -76,13 +77,13 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/descripcionServicios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         app:boxCornerRadiusBottomEnd="8dp"
         app:boxCornerRadiusBottomStart="8dp"
         app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        app:boxCornerRadiusTopStart="8dp">
 
         <EditText
             android:id="@+id/descripcionServiciosED"

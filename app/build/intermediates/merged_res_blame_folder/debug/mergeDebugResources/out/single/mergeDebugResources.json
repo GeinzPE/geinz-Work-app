@@ -100,10 +100,6 @@
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\fragment_image_dialog.xml"
     },
     {
-        "merged": "com.geinzz.geinzwork.app-debug-56:/layout_activity_ver_publicaciones.xml.flat",
-        "source": "com.geinzz.geinzwork.app-main-58:/layout/activity_ver_publicaciones.xml"
-    },
-    {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-debug-56:\\layout_fragment_cuenta_fracment.xml.flat",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\fragment_cuenta_fracment.xml"
     },
@@ -1842,6 +1838,10 @@
     {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-debug-56:\\layout_activity_planes_noticias_servicios_geinz.xml.flat",
         "source": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-main-58:\\layout\\activity_planes_noticias_servicios_geinz.xml"
+    },
+    {
+        "merged": "com.geinzz.geinzwork.app-debug-56:/layout_bottom_sheet_editar_publicacion.xml.flat",
+        "source": "com.geinzz.geinzwork.app-main-58:/layout/bottom_sheet_editar_publicacion.xml"
     },
     {
         "merged": "C:\\Users\\Benjamin\\.gradle\\daemon\\8.6\\com.geinzz.geinzwork.app-debug-56:\\layout_activity_quinta.xml.flat",
