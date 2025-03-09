@@ -5526,6 +5526,7 @@ int id linealPrecio 0x7f0a045a
 int id linealPrecioDelivery 0x7f0a045b
 int id linealPrecioTexview 0x7f0a045c
 int id linealPrincipal 0x7f0a045d
+int id linealPublicaciones_edit_delete 0x7f0a078f
 int id linealRedes 0x7f0a045e
 int id linealReferencia 0x7f0a045f
 int id linealSakeBAr 0x7f0a0460
@@ -6514,7 +6515,6 @@ int layout activity_cuenta_info 0x7f0d002c
 int layout activity_cuenta_user 0x7f0d002d
 int layout activity_direccion_entrega_lat_log 0x7f0d002e
 int layout activity_editar_info 0x7f0d002f
-int layout activity_editar_publicaciones 0x7f0d0030
 int layout activity_editar_review 0x7f0d0031
 int layout activity_generar_qr_trabajador 0x7f0d0032
 int layout activity_generar_qrpedido_articulos 0x7f0d0033
@@ -6577,6 +6577,7 @@ int layout bottom_sheet_config_cuenta 0x7f0d006b
 int layout bottom_sheet_contacta_trabajador 0x7f0d006c
 int layout bottom_sheet_creacion_cuenta 0x7f0d006d
 int layout bottom_sheet_crear_cuenta_tienda 0x7f0d006e
+int layout bottom_sheet_editar_publicacion 0x7f0d0177
 int layout bottom_sheet_filtrado_compras_carrito 0x7f0d006f
 int layout bottom_sheet_filtrar_resultados_promo 0x7f0d0070
 int layout bottom_sheet_info_publicidad 0x7f0d0071

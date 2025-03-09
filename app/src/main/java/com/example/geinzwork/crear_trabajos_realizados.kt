@@ -16,7 +16,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.example.geinzwork.constantesGeneral.Variables
-import com.geinzz.geinzwork.adapterViewholder.publicaciones_ralizadas
 import com.geinzz.geinzwork.constantesGeneral.constantesCarrito
 import com.geinzz.geinzwork.databinding.ActivityCrearTrabajosRealizadosBinding
 import com.geinzz.geinzwork.hora.ImageDialogFragmentURI

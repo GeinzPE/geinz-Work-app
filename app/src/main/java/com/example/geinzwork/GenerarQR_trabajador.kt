@@ -30,6 +30,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.example.geinzwork.constantesGeneral.Variables
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
 import com.geinzz.geinzwork.databinding.ActivityGenerarQrTrabajadorBinding
 import com.geinzz.geinzwork.vistaTrabajador.vistaTrabajador
 import com.google.firebase.Firebase
@@ -96,16 +97,21 @@ class GenerarQR_trabajador : AppCompatActivity() {
                                 binding.textoGeinz.isVisible = true
                                 binding.linealCompartirDescargar.isVisible = true
                                 binding.contenedorSinQr.isVisible = false
-                            }, 4000)
+                            }, 1000)
 
-                            try {
-                                Glide.with(this)
-                                    .load(img)
-                                    .into(binding.imageView)
+                            constatnes_carga_imagenes_general.changer_img(
+                                binding.progressCargaImagen,
+                                this,
+                                img.toString(),
+                                null,
+                                binding.imageView,
+                                "portada",
+                                null
+                            )
 
-                            } catch (e: Exception) {
-                                println("error al setear la img")
-                            }
+                            println("la img del ql es $img")
+
+
                             binding.compartir.setOnClickListener {
                                 createAndShareDynamicLink(idTrabajdor)
                             }
@@ -126,9 +132,7 @@ class GenerarQR_trabajador : AppCompatActivity() {
                     }
                 }
             }
-
             else -> {
-
                 val db = FirebaseFirestore.getInstance()
                     .collection(Variables.trabajadores_usuariosDB)
                     .document(Variables.trabajadoresDB)
@@ -146,14 +150,16 @@ class GenerarQR_trabajador : AppCompatActivity() {
                                 val apellido = data?.get(Variables.apellido) as? String
                                 binding.nombreTrabajador.text = "${nombre} ${apellido}"
                                 binding.nombreTrabajador.isVisible = true
-                                try {
-                                    Glide.with(this)
-                                        .load(img)
-                                        .into(binding.imageView)
+                                    constatnes_carga_imagenes_general.changer_img(
+                                        binding.progressCargaImagen,
+                                        this,
+                                        img.toString(),
+                                        null,
+                                        binding.imageView,
+                                        "portada",
+                                        null
+                                    )
 
-                                } catch (e: Exception) {
-                                    println("error al setear la img")
-                                }
 
                                 binding.textoOculto.isVisible = false
                                 binding.generarQR.isVisible = false
@@ -174,7 +180,7 @@ class GenerarQR_trabajador : AppCompatActivity() {
                                 ).show()
                             }
                             binding.loading.isVisible = false
-                        }, 4000)
+                        }, 1000)
 
 
                     } else {
@@ -235,13 +241,15 @@ class GenerarQR_trabajador : AppCompatActivity() {
         }
 
     }
+
     @SuppressLint("StringFormatInvalid")
     private fun createAndShareDynamicLink(
         idTrabajador: String,
     ) {
         val userCollections =
             FirebaseFirestore.getInstance().collection(Variables.trabajadores_usuariosDB)
-                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB).document(idTrabajador)
+                .document(Variables.trabajadoresDB).collection(Variables.trabajadoresDB)
+                .document(idTrabajador)
 
         userCollections.get().addOnSuccessListener { res ->
             if (res.exists()) {
@@ -301,9 +309,6 @@ class GenerarQR_trabajador : AppCompatActivity() {
     }
 
 
-
-
-
     private fun uploadQRCodeToFirebase(imageView: ImageView) {
         // Capturar la imagen del ImageView
         imageView.isDrawingCacheEnabled = true
@@ -339,7 +344,7 @@ class GenerarQR_trabajador : AppCompatActivity() {
                     db.set(hasmap, SetOptions.merge()).addOnSuccessListener {
                         Toast.makeText(
                             this,
-                            "QR subido exitosamente a Firestore",
+                            "QR subido cargado exitosamente ",
                             Toast.LENGTH_SHORT
                         ).show()
                     }.addOnFailureListener { e ->
@@ -349,7 +354,7 @@ class GenerarQR_trabajador : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                    Toast.makeText(this, "QR subido exitosamente storage", Toast.LENGTH_SHORT)
+                    Toast.makeText(this, "QR subido cargado exitosamente", Toast.LENGTH_SHORT)
                         .show()
                 }
             }

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.geinzwork.constantesGeneral.constatnes_carga_imagenes_general
 import com.geinzz.geinzwork.databinding.ItemTrabajosMostradosBinding
 import com.geinzz.geinzwork.dataclass.dataClassTrabajosMostrados
 
@@ -43,13 +44,15 @@ class adapterTrabajos(
                 vermas(dataClassTrabajosMostrados)
             }
             tipoT.text = dataClassTrabajosMostrados.tipoT
-            try {
-                Glide.with(itemView.context)
-                    .load(dataClassTrabajosMostrados.imgResId)
-                    .into(img)
-            } catch (e: Exception) {
-                println("error al setear la img")
-            }
+            constatnes_carga_imagenes_general.changer_img(
+                binding.progressCargaImagen,
+                itemView.context,
+                dataClassTrabajosMostrados.imgResId.toString(),
+                null,
+                img,
+                "portada",
+                null // Usa el placeholder también en el else
+            )
             nombre.text = dataClassTrabajosMostrados.categorias
         }
     }
