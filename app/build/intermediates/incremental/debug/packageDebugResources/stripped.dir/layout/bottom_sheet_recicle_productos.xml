@@ -144,12 +144,14 @@
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
                 android:orientation="horizontal"
+
                 android:visibility="gone">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnApply"
                     style="@style/RoundedButton"
                     android:layout_width="match_parent"
+
                     android:layout_height="60dp"
                     android:layout_marginRight="5dp"
                     android:layout_weight="1"
@@ -160,6 +162,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/general"
+
                     style="@style/RoundedButton"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"

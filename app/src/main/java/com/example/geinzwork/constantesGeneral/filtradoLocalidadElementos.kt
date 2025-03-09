@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import com.example.geinzwork.constantesGeneral.Variables
 import com.geinzz.geinzwork.R
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -30,7 +32,14 @@ object filtradoLocalidadElementos {
         val btnApply = view.findViewById<Button>(R.id.btnApply)
         val btnCancel = view.findViewById<Button>(R.id.btnCancel)
         val Title = view.findViewById<TextView>(R.id.tvTitle)
+        val deGeinz=view.findViewById<Button>(R.id.geinz)
+        val general =view.findViewById<Button>(R.id.general)
         val autoCompleteCategory = view.findViewById<AutoCompleteTextView>(R.id.categoria)
+        val linealBotomoes=view.findViewById<LinearLayout>(R.id.lineal_filtrado_btn)
+
+        linealBotomoes.isVisible=true
+        general.isVisible=false
+        deGeinz.isVisible=false
 
 
         obtenerLocalidadUser { localidad ->
